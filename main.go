@@ -2,6 +2,7 @@
 package main
 
 import (
+    "bufio"
     "context"
     "encoding/json"
     "flag"
@@ -13,6 +14,7 @@ import (
 var (
     help             = flag.Bool("h", false, "Display a help message and exit.")
     districtDataFile = flag.String("f", "", "File that stores district data.")
+    withJson         = flag.Bool("with-json", false, "Whether to generate json data.")
 )
 
 func main() {
@@ -28,14 +30,39 @@ func main() {
     ctx := context.Background()
     districtTable, err := district.LoadDistrict(ctx, *districtDataFile)
     if err != nil {
-        fmt.Fprintf(os.Stderr, "load district error: %s\n", err.Error())
-    } else {
+        fmt.Fprintf(os.Stderr, "Load district error: %s.\n", err.Error())
+        os.Exit(2)
+    }
+
+    done := false
+    if *withJson {
+        done = true
         jsonBytes, err := json.Marshal(*districtTable)
         if err != nil {
-            fmt.Fprintf(os.Stderr, "json marshal error: %s\n", err.Error())
+            fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
         } else {
-            fmt.Fprintf(os.Stdout, "%s\n", string(jsonBytes))
+            filepath := "district.json"
+            file, writer := createFile(filepath)
+            if file == nil {
+                os.Exit(3)
+            }
+            defer file.Close()
+
+            _, err = writer.WriteString(string(jsonBytes))
+            if err != nil {
+                fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+                os.Exit(3)
+            }
+            err = writer.Flush()
+            if err != nil {
+                fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
+                os.Exit(3)
+            }
         }
+    }
+    if !done {
+        fmt.Fprintf(os.Stderr, "Do nothing.\n")
+        os.Exit(4)
     }
 }
 
@@ -50,4 +77,14 @@ func checkParameters() bool {
     }
 
     return true
+}
+
+func createFile(filepath string) (*os.File, *bufio.Writer) {
+    file, err := os.Create(filepath)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Create file://%s error: %s.\n", filepath, err.Error())
+        return nil, nil
+    }
+
+    return file, bufio.NewWriter(file)
 }
