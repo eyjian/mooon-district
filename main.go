@@ -15,6 +15,7 @@ var (
     help             = flag.Bool("h", false, "Display a help message and exit.")
     districtDataFile = flag.String("f", "", "File that stores district data.")
     withJson         = flag.Bool("with-json", false, "Whether to generate json data.")
+    withSql          = flag.Bool("with-sql", false, "Whether to generate sql data.")
 )
 
 func main() {
@@ -37,27 +38,8 @@ func main() {
     done := false
     if *withJson {
         done = true
-        jsonBytes, err := json.Marshal(*districtTable)
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
-        } else {
-            filepath := "district.json"
-            file, writer := createFile(filepath)
-            if file == nil {
-                os.Exit(3)
-            }
-            defer file.Close()
-
-            _, err = writer.WriteString(string(jsonBytes))
-            if err != nil {
-                fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                os.Exit(3)
-            }
-            err = writer.Flush()
-            if err != nil {
-                fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
-                os.Exit(3)
-            }
+        if !generateJson(districtTable) {
+            os.Exit(3)
         }
     }
     if !done {
@@ -87,4 +69,32 @@ func createFile(filepath string) (*os.File, *bufio.Writer) {
     }
 
     return file, bufio.NewWriter(file)
+}
+
+func generateJson(districtTable *district.Table) bool {
+    jsonBytes, err := json.Marshal(*districtTable)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
+        return false
+    }
+
+    filepath := "district.json"
+    file, writer := createFile(filepath)
+    if file == nil {
+        return false
+    }
+    defer file.Close()
+
+    _, err = writer.WriteString(string(jsonBytes))
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+        return false
+    }
+    err = writer.Flush()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
+        return false
+    }
+
+    return true
 }
