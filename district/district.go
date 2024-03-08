@@ -6,6 +6,7 @@ import (
     "bufio"
     "context"
     "fmt"
+    "io"
     "os"
     "strconv"
     "strings"
@@ -59,6 +60,9 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
         lineNo = lineNo + 1
         line, err := reader.ReadString('\n')
         if err != nil {
+            if err == io.EOF {
+                break
+            }
             return nil, err
         }
 
@@ -76,7 +80,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
             if district == nil {
                 continue
             }
-            fmt.Println(*district)
+            //fmt.Println(*district)
             if district.Code == district.Parent && district.Code == district.Grandparent {
                 // 省/自治区/直辖市
                 provinceDistrict := ProvinceDistrict{
