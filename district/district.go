@@ -147,14 +147,14 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
     return &districtTable, nil
 }
 
-func GenerateJson(districtTable *Table) bool {
+func GenerateJson(districtTable *Table, jsonFilepath string) bool {
+    filepath := jsonFilepath
     jsonBytes, err := json.Marshal(*districtTable)
     if err != nil {
         fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
         return false
     }
 
-    filepath := "district.json"
     file, writer := createFile(filepath)
     if file == nil {
         return false
@@ -175,8 +175,8 @@ func GenerateJson(districtTable *Table) bool {
     return true
 }
 
-func GenerateCsv(districtTable *Table, csvDelimiter string) bool {
-    filepath := "district.csv"
+func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string) bool {
+    filepath := csvFilepath
     file, writer := createFile(filepath)
     if file == nil {
         return false

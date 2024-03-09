@@ -38,13 +38,13 @@ func main() {
     done := false
     if *withJson {
         done = true
-        if !district.GenerateJson(districtTable) {
+        if !district.GenerateJson(districtTable, "example.json") {
             os.Exit(3)
         }
     }
     if *withCsv {
         done = true
-        if !district.GenerateCsv(districtTable, *csvDelimiter) {
+        if !district.GenerateCsv(districtTable, "example.csv", *csvDelimiter) {
             os.Exit(3)
         }
     }
