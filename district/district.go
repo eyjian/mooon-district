@@ -19,16 +19,18 @@ type Table struct {
 // ProvinceDistrict 省/自治区/直辖市
 type ProvinceDistrict struct {
     Code              uint32                  `json:"code"`
-    Name              string                  `json:"name"`  // 行政区名称
-    Level             uint32                  `json:"level"` // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
+    Name              string                  `json:"name"`         // 行政区名称
+    Level             uint32                  `json:"level"`        // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
+    Municipality      bool                    `json:"municipality"` // 直辖市
     CityDistrictTable map[uint32]CityDistrict `json:"city_list,omitempty"`
 }
 
 // CityDistrict 市/州/盟
 type CityDistrict struct {
     Code                uint32              `json:"code"`
-    Name                string              `json:"name"`  // 行政区名称
-    Level               uint32              `json:"level"` // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
+    Name                string              `json:"name"`        // 行政区名称
+    Level               uint32              `json:"level"`       // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
+    CountyCity          bool                `json:"county_city"` // 县级市
     CountyDistrictTable map[uint32]District `json:"county_list,omitempty"`
 }
 
@@ -81,6 +83,9 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                 continue
             }
             //fmt.Println(*district)
+
+            provinceCode := getProvinceDistrictCode(district.Code)
+            cityCode := getCityDistrictCode(district.Code)
             if isProvinceDistrict(district.Code) {
                 // 省/自治区/直辖市
                 provinceDistrict := ProvinceDistrict{
@@ -88,8 +93,9 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                     Name:              district.Name,
                     Level:             district.Level,
                     CityDistrictTable: make(map[uint32]CityDistrict),
+                    Municipality:      isMunicipality(district.Code),
                 }
-                districtTable.ProvinceDistrictTable[district.Code] = provinceDistrict
+                districtTable.ProvinceDistrictTable[provinceCode] = provinceDistrict
             } else if isCityDistrict(district.Code) {
                 // 市/州/盟
                 cityDistrict := CityDistrict{
@@ -97,22 +103,34 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                     Name:                district.Name,
                     Level:               district.Level,
                     CountyDistrictTable: make(map[uint32]District),
+                    CountyCity:          false,
                 }
-                districtTable.ProvinceDistrictTable[district.Grandparent].CityDistrictTable[district.Code] = cityDistrict
+                districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode] = cityDistrict
             } else if isCountyDistrict(district.Code) {
-                countyDistrictTable, ok := districtTable.ProvinceDistrictTable[district.Grandparent].CityDistrictTable[district.Code]
-                if ok {
-                    // 县/县级市/旗
-                    countyDistrictTable.CountyDistrictTable[district.Code] = *district
+                if !isMunicipality(district.Code) {
+                    if districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable == nil {
+                        // 省直辖县级市（济源市，河南省直辖县级市）
+                        cityDistrict := CityDistrict{
+                            Code:                district.Code,
+                            Name:                district.Name,
+                            Level:               district.Level,
+                            CountyDistrictTable: make(map[uint32]District),
+                            CountyCity:          true,
+                        }
+                        districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode] = cityDistrict
+                    } else {
+                        // 县/县级市/旗
+                        districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable[district.Code] = *district
+                    }
                 } else {
                     // 直辖市的区县
                     cityDistrict := CityDistrict{
                         Code:                district.Code,
                         Name:                district.Name,
-                        Level:               district.Level,
+                        Level:               district.Level - 1,
                         CountyDistrictTable: make(map[uint32]District),
                     }
-                    districtTable.ProvinceDistrictTable[district.Grandparent].CityDistrictTable[district.Code] = cityDistrict
+                    districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[district.Code] = cityDistrict
                 }
             } else {
                 return nil, fmt.Errorf("invalid row data: (%d) %s", lineNo, line)
@@ -183,4 +201,12 @@ func isCityDistrict(code uint32) bool {
 
 func isCountyDistrict(code uint32) bool {
     return code%10000 != 0 && code%100 != 0
+}
+
+func getProvinceDistrictCode(code uint32) uint32 {
+    return (code / 10000) * 10000
+}
+
+func getCityDistrictCode(code uint32) uint32 {
+    return (code / 100) * 100
 }
