@@ -1,15 +1,15 @@
 /*
 DROP TABLE t_dict_district;
 CREATE TABLE t_dict_district (
-  f_province_code INT UNSIGNED NOT NULL,
-  f_city_code INT UNSIGNED NOT NULL,
-  f_county_code INT UNSIGNED NOT NULL,
-  f_level TINYINT UNSIGNED NOT NULL,
-  f_province_name VARCHAR(20) NOT NULL,
-  f_city_name VARCHAR(20) NOT NULL,
-  f_county_name VARCHAR(20) NOT NULL,
+  f_province_code INT UNSIGNED NOT NULL COMMENT '省/自治区/直辖市代码',
+  f_city_code INT UNSIGNED NOT NULL COMMENT '市/州/盟代码',
+  f_county_code INT UNSIGNED NOT NULL COMMENT '县/县级市/旗代码',
+  f_level TINYINT UNSIGNED NOT NULL COMMENT '行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）',
+  f_province_name VARCHAR(20) NOT NULL COMMENT '省/自治区/直辖市全名',
+  f_city_name VARCHAR(20) NOT NULL COMMENT '市/州/盟全名/省直辖县、县级市、旗',
+  f_county_name VARCHAR(20) NOT NULL COMMENT '县/县级市/旗全名',
   PRIMARY KEY (f_province_code,f_city_code,f_county_code),
-  KEY (f_province_name),
+  UNIQUE KEY (f_province_name,f_city_name,f_county_name),
   KEY (f_city_name),
   KEY (f_county_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
