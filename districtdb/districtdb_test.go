@@ -21,52 +21,53 @@ func TestGetDistrictCode(t *testing.T) {
         t.Error("failed to connect database")
     } else {
         tableName := "t_dict_district"
+        query := NewQuery(db, tableName)
         name := &DistrictName{
             ProvinceName: "广东省",
             CityName:     "珠海市",
             CountyName:   "香洲区",
         }
-        queryDistrictCode(t, ctx, db, tableName, name, 1)
+        queryDistrictCode(t, ctx, query, tableName, name, 1)
 
         name.CountyName = "香洲区X"
-        queryDistrictCode(t, ctx, db, tableName, name, 2)
+        queryDistrictCode(t, ctx, query, tableName, name, 2)
 
-        tableName = "t_dict_districtX"
+        query.TableName = "t_dict_districtX"
         name.CountyName = "香洲区"
-        queryDistrictCode(t, ctx, db, tableName, name, 3)
+        queryDistrictCode(t, ctx, query, tableName, name, 3)
 
-        tableName = "t_dict_district"
+        query.TableName = "t_dict_district"
         name.ProvinceName = "广东省X"
-        queryDistrictCode(t, ctx, db, tableName, name, 2)
+        queryDistrictCode(t, ctx, query, tableName, name, 2)
 
         name.ProvinceName = "广东省"
         name.CityName = "珠海市X"
-        queryDistrictCode(t, ctx, db, tableName, name, 2)
+        queryDistrictCode(t, ctx, query, tableName, name, 2)
 
         name.ProvinceName = "海南省"
         name.CityName = "文昌市"
         name.CountyName = ""
-        queryDistrictCode(t, ctx, db, tableName, name, 1)
+        queryDistrictCode(t, ctx, query, tableName, name, 1)
 
         name.ProvinceName = "北京市"
         name.CityName = "海淀区"
-        queryDistrictCode(t, ctx, db, tableName, name, 1)
+        queryDistrictCode(t, ctx, query, tableName, name, 1)
 
         name.ProvinceName = "河南省"
         name.CityName = "济源市"
-        queryDistrictCode(t, ctx, db, tableName, name, 1)
+        queryDistrictCode(t, ctx, query, tableName, name, 1)
 
         name.ProvinceName = "台湾省"
         name.CityName = "台北市"
-        queryDistrictCode(t, ctx, db, tableName, name, 2)
+        queryDistrictCode(t, ctx, query, tableName, name, 2)
 
         name.ProvinceName = "香港特别行政区"
         name.CityName = "香港岛"
-        queryDistrictCode(t, ctx, db, tableName, name, 2)
+        queryDistrictCode(t, ctx, query, tableName, name, 2)
 
         name.ProvinceName = "澳门特别行政区"
         name.CityName = "澳门半岛"
-        queryDistrictCode(t, ctx, db, tableName, name, 2)
+        queryDistrictCode(t, ctx, query, tableName, name, 2)
     }
 }
 
@@ -81,35 +82,36 @@ func TestGetDistrictName(t *testing.T) {
         t.Error("failed to connect database")
     } else {
         tableName := "t_dict_district"
+        query := NewQuery(db, tableName)
         code := &DistrictCode{
             ProvinceCode: 440000,
             CityCode:     440400,
             CountyCode:   440402,
         }
-        queryDistrictName(t, ctx, db, tableName, code, 1)
+        queryDistrictName(t, ctx, query, tableName, code, 1)
 
         code.CountyCode = 4404020
-        queryDistrictName(t, ctx, db, tableName, code, 2)
+        queryDistrictName(t, ctx, query, tableName, code, 2)
 
-        tableName = "t_dict_districtX"
-        queryDistrictName(t, ctx, db, tableName, code, 3)
+        query.TableName = "t_dict_districtX"
+        queryDistrictName(t, ctx, query, tableName, code, 3)
 
-        tableName = "t_dict_district"
+        query.TableName = "t_dict_district"
         code.ProvinceCode = 4400000
-        queryDistrictName(t, ctx, db, tableName, code, 2)
+        queryDistrictName(t, ctx, query, tableName, code, 2)
 
         code.ProvinceCode = 440000
         code.CityCode = 4404000
-        queryDistrictName(t, ctx, db, tableName, code, 2)
+        queryDistrictName(t, ctx, query, tableName, code, 2)
 
         code.ProvinceCode = 460000
         code.CityCode = 469000
         code.CountyCode = 0
-        queryDistrictName(t, ctx, db, tableName, code, 2)
+        queryDistrictName(t, ctx, query, tableName, code, 2)
 
         code.ProvinceCode = 110000
         code.CityCode = 110100
-        queryDistrictName(t, ctx, db, tableName, code, 2)
+        queryDistrictName(t, ctx, query, tableName, code, 2)
     }
 }
 
@@ -118,8 +120,8 @@ func TestGetDistrictName(t *testing.T) {
 // 1）期待成功
 // 2）期待不存在
 // 3）期待出错
-func queryDistrictCode(t *testing.T, ctx context.Context, db *gorm.DB, tableName string, name *DistrictName, expect int) {
-    result, err := GetDistrictCode(ctx, db, tableName, name)
+func queryDistrictCode(t *testing.T, ctx context.Context, query *Query, tableName string, name *DistrictName, expect int) {
+    result, err := query.GetDistrictCode(ctx, name)
     if err != nil {
         if expect == 3 {
             t.Logf("[%s,%s,expect:%d] error: %s\n", tableName, *name, expect, err.Error())
@@ -148,8 +150,8 @@ func queryDistrictCode(t *testing.T, ctx context.Context, db *gorm.DB, tableName
 // 1）期待成功
 // 2）期待不存在
 // 3）期待出错
-func queryDistrictName(t *testing.T, ctx context.Context, db *gorm.DB, tableName string, code *DistrictCode, expect int) {
-    result, err := GetDistrictName(ctx, db, tableName, code)
+func queryDistrictName(t *testing.T, ctx context.Context, query *Query, tableName string, code *DistrictCode, expect int) {
+    result, err := query.GetDistrictName(ctx, code)
     if err != nil {
         if expect == 3 {
             t.Logf("[%s,%d,%d,%d,expect:%d] error: %s\n", tableName, code.ProvinceCode, code.CityCode, code.CountyCode, expect, err.Error())
