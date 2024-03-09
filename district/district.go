@@ -345,6 +345,7 @@ func parseLine(lineNo int, line string) (*District, error) {
     }, nil
 }
 
+// isMunicipality 是否为直辖市
 func isMunicipality(code uint32) bool {
     provinceCode := (code / 10000) * 10000
     return provinceCode == 110000 || // 北京市
