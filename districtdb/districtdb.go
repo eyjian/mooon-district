@@ -10,6 +10,7 @@ import (
     "fmt"
     "github.com/coocood/freecache"
     "gorm.io/gorm"
+    "io"
     "runtime/debug"
     "strings"
 )
@@ -21,6 +22,20 @@ type Query struct {
     Db            *gorm.DB
     TableName     string
     ExpireSeconds int
+}
+
+// CacheMetric 缓存的度量数据
+type CacheMetric struct {
+    EntryCount        int64   `json:"entry_count"`
+    ExpiredCount      int64   `json:"expired_count"`
+    EvacuateCount     int64   `json:"evacuate_count"`
+    LookupCount       int64   `json:"lookup_count"`
+    AverageAccessTime int64   `json:"average_access_time"`
+    HitCount          int64   `json:"hit_count"`
+    MissCount         int64   `json:"miss_count"`
+    OverwriteCount    int64   `json:"overwrite_count"`
+    TouchedCount      int64   `json:"touched_count"`
+    HitRate           float64 `json:"hit_rate"`
 }
 
 // DistrictName 行政区名（字符集需同 DB 等保持一致）
@@ -63,6 +78,39 @@ func (d *DistrictCode) Md5Sum() string {
 func Md5Sum(data string) string {
     hash := md5.Sum([]byte(data))
     return strings.ToLower(hex.EncodeToString(hash[:]))
+}
+
+func (c *CacheMetric) String() (string, error) {
+    jsonBytes, err := json.Marshal(*c)
+    if err != nil {
+        return "", fmt.Errorf("json marshal error: %s", err.Error())
+    }
+    return string(jsonBytes), nil
+}
+
+func CacheMetricFPrintf(w io.Writer) {
+    cacheMetric := GetCacheMetric()
+    str, err := cacheMetric.String()
+    if err != nil {
+        fmt.Fprintf(w, "%s\n", err.Error())
+    } else {
+        fmt.Fprintf(w, "%s\n", str)
+    }
+}
+
+func GetCacheMetric() *CacheMetric {
+    return &CacheMetric{
+        EntryCount:        districtCache.EntryCount(),
+        ExpiredCount:      districtCache.ExpiredCount(),
+        EvacuateCount:     districtCache.EvacuateCount(),
+        LookupCount:       districtCache.LookupCount(),
+        AverageAccessTime: districtCache.AverageAccessTime(),
+        HitCount:          districtCache.HitCount(),
+        MissCount:         districtCache.MissCount(),
+        OverwriteCount:    districtCache.OverwriteCount(),
+        TouchedCount:      districtCache.TouchedCount(),
+        HitRate:           districtCache.HitRate(),
+    }
 }
 
 // GetDistrictCode 通过行政区名取得行政区代码
@@ -140,12 +188,12 @@ func (q *Query) getDistrictCodeFromCache(name *DistrictName) (*DistrictCode, err
     cacheKey := name.Md5Sum()
     jsonBytes, err := districtCache.Get([]byte(cacheKey))
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("cache get error: %s", err.Error())
     }
 
     err = json.Unmarshal(jsonBytes, code)
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("cache json unmarshal error: %s", err.Error())
     }
 
     return &code, nil
@@ -155,12 +203,12 @@ func (q *Query) updateDistrictCodeToCache(name *DistrictName, code *DistrictCode
     cacheKey := name.Md5Sum()
     jsonBytes, err := json.Marshal(*code)
     if err != nil {
-        return err
+        return fmt.Errorf("cache json marshal error: %s", err.Error())
     }
 
     err = districtCache.Set([]byte(cacheKey), jsonBytes, q.ExpireSeconds)
     if err != nil {
-        return err
+        return fmt.Errorf("cache set error: %s", err.Error())
     }
 
     return nil
@@ -171,12 +219,12 @@ func (q *Query) getDistrictNameFromCache(code *DistrictCode) (*DistrictName, err
     cacheKey := code.Md5Sum()
     jsonBytes, err := districtCache.Get([]byte(cacheKey))
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("cache get error: %s", err.Error())
     }
 
     err = json.Unmarshal(jsonBytes, name)
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("cache json unmarshal error: %s", err.Error())
     }
 
     return &name, nil
@@ -186,12 +234,12 @@ func (q *Query) updateDistrictNameToCache(code *DistrictCode, name *DistrictName
     cacheKey := code.Md5Sum()
     jsonBytes, err := json.Marshal(*name)
     if err != nil {
-        return err
+        return fmt.Errorf("cache json marshal error: %s", err.Error())
     }
 
     err = districtCache.Set([]byte(cacheKey), jsonBytes, q.ExpireSeconds)
     if err != nil {
-        return err
+        return fmt.Errorf("cache set error: %s", err.Error())
     }
 
     return nil

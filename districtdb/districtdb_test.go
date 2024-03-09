@@ -52,6 +52,7 @@ func TestGetDistrictCode(t *testing.T) {
         name.ProvinceName = "北京市"
         name.CityName = "海淀区"
         queryDistrictCode(t, ctx, query, tableName, name, 1)
+        queryDistrictCode(t, ctx, query, tableName, name, 1)
 
         name.ProvinceName = "河南省"
         name.CityName = "济源市"
@@ -68,6 +69,8 @@ func TestGetDistrictCode(t *testing.T) {
         name.ProvinceName = "澳门特别行政区"
         name.CityName = "澳门半岛"
         queryDistrictCode(t, ctx, query, tableName, name, 2)
+
+        CacheMetricFPrintf(os.Stdout)
     }
 }
 
@@ -112,6 +115,8 @@ func TestGetDistrictName(t *testing.T) {
         code.ProvinceCode = 110000
         code.CityCode = 110100
         queryDistrictName(t, ctx, query, tableName, code, 2)
+
+        CacheMetricFPrintf(os.Stdout)
     }
 }
 
