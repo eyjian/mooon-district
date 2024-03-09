@@ -125,7 +125,7 @@ func (q *Query) GetDistrictCode(ctx context.Context, name *DistrictName) (*Distr
     }
 
     code, err = q.getDistrictCodeFromDb(ctx, name)
-    if err != nil && code != nil {
+    if err == nil && code != nil {
         q.updateDistrictCodeToCache(name, code)
     }
     return code, err
@@ -143,7 +143,7 @@ func (q *Query) GetDistrictName(ctx context.Context, code *DistrictCode) (*Distr
     }
 
     name, err = q.getDistrictNameFromDb(ctx, code)
-    if err != nil && name != nil {
+    if err == nil && name != nil {
         q.updateDistrictNameToCache(code, name)
     }
     return name, err
