@@ -189,13 +189,18 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
     defer file.Close()
 
     for _, provinceDistrict := range districtTable.Provinces {
+        if !withCode {
+            writer.WriteString(fmt.Sprintf("%s\n", provinceDistrict.Name))
+        } else {
+            writer.WriteString(fmt.Sprintf("%d%s%s\n", provinceDistrict.Code, csvDelimiter, provinceDistrict.Name))
+        }
         for _, cityDistrict := range provinceDistrict.Cities {
             if !withCode {
                 _, err = writer.WriteString(fmt.Sprintf("%s%s%s\n",
                     provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
             } else {
                 _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s\n",
-                    provinceDistrict.Code, csvDelimiter,
+                    cityDistrict.Code, csvDelimiter,
                     provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
             }
             if err != nil {
@@ -209,7 +214,7 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
                         cityDistrict.Name, csvDelimiter, countyDistrict.Name))
                 } else {
                     _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s%s%s\n",
-                        provinceDistrict.Code, csvDelimiter,
+                        countyDistrict.Code, csvDelimiter,
                         provinceDistrict.Name, csvDelimiter,
                         cityDistrict.Name, csvDelimiter, countyDistrict.Name))
                 }
