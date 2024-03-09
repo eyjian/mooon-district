@@ -113,6 +113,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                 districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode] = cityDistrict
             } else if isCountyDistrict(district.Code) {
                 if !isMunicipality(district.Code) {
+                    // 非直辖市
                     if districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable == nil {
                         // 省直辖县级市（济源市，河南省直辖县级市；五指山市，海南省直辖县级市）
                         cityDistrict := CityDistrict{
