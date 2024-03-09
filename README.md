@@ -2,6 +2,21 @@
 
 一个行政区数据工具，可以用来生成 json 格式数据、SQL 插入语句和 csv 格式的数据。
 
+# 安装工具
+
+```shell
+go get github.com/eyjian/mooon-district@latest
+go build -o district_tool github.com/eyjian/mooon-district
+```
+
+也可使用
+
+```shell
+go install github.com/eyjian/mooon-district@latest
+```
+
+但生成的命令文件名为 mooon-district，而不是 district_tool 。
+
 # 生成 json 格式数据
 
 ```shell
