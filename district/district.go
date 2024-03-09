@@ -8,6 +8,7 @@ import (
     "fmt"
     "io"
     "os"
+    "sort"
     "strconv"
     "strings"
 )
@@ -221,8 +222,17 @@ func perfectTable(table *Table) {
             for _, countyDistrict := range cityDistrict.CountyDistrictTable {
                 cityDistrict.Counties = append(cityDistrict.Counties, countyDistrict)
             }
+            sort.Slice(cityDistrict.Counties, func(i, j int) bool {
+                return cityDistrict.Counties[i].Code < cityDistrict.Counties[j].Code
+            })
             provinceDistrict.Cities = append(provinceDistrict.Cities, cityDistrict)
         }
+        sort.Slice(provinceDistrict.Cities, func(i, j int) bool {
+            return provinceDistrict.Cities[i].Code < provinceDistrict.Cities[j].Code
+        })
         table.Provinces = append(table.Provinces, provinceDistrict)
     }
+    sort.Slice(table.Provinces, func(i, j int) bool {
+        return table.Provinces[i].Code < table.Provinces[j].Code
+    })
 }
