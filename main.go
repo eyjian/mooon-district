@@ -12,13 +12,14 @@ import (
 var (
     help             = flag.Bool("h", false, "Display a help message and exit.")
     districtDataFile = flag.String("f", "", "File that stores district data.")
-    withJson         = flag.Bool("with-json", false, "Whether to generate json data.")
-    withCsv          = flag.Bool("with-csv", false, "Whether to generate csv data.")
+    withJson         = flag.Bool("with-json", false, "Whether to generate json format data.")
+    withCsv          = flag.Bool("with-csv", false, "Whether to generate csv format data.")
     withSql          = flag.Bool("with-sql", false, "Whether to generate sql data.")
     withJsonIndent   = flag.Bool("with-json-indent", true, "Whether JSON format is indented.")
     jsonIndent       = flag.String("json-indent", "  ", "Json indent when -with-json-indent is enabled.")
     jsonPrefix       = flag.String("json-prefix", "", "Prefix for each line when -with-json-indent is enabled.")
     csvDelimiter     = flag.String("csv-delimiter", ",", "Delimiter of csv data.")
+    csvWithCode      = flag.Bool("csv-with-code", true, "Whether the csv format outputs the code column.")
 )
 
 func main() {
@@ -47,7 +48,7 @@ func main() {
     }
     if *withCsv {
         done = true
-        if !district.GenerateCsv(districtTable, "example.csv", *csvDelimiter) {
+        if !district.GenerateCsv(districtTable, "example.csv", *csvDelimiter, *csvWithCode) {
             os.Exit(3)
         }
     }
