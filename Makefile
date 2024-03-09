@@ -1,9 +1,11 @@
-all: district_tool
+target=mooon-district
 
-district_tool: main.go district/district.go
+all: ${target}
+
+${target}: main.go district/district.go
 	go build -o $@ $<
 
 .PHONY: clean
 
 clean:
-	rm -f district_tool
+	rm -f ${target}

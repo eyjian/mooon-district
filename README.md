@@ -5,40 +5,31 @@
 # 安装工具
 
 ```shell
-go get github.com/eyjian/mooon-district@latest
-go build -o district_tool github.com/eyjian/mooon-district
-```
-
-也可使用
-
-```shell
 go install github.com/eyjian/mooon-district@latest
 ```
-
-但生成的命令文件名为 mooon-district，而不是 district_tool 。
 
 # 生成 json 格式数据
 
 ```shell
-./district_tool -f ./district-2022.csv -with-json=true
+mooon-district -f ./district-2022.csv -with-json=true
 ```
 
 # 生成 csv 格式数据：
 
 ```shell
-./district_tool -f ./district-2022.csv -with-csv=true
+mooon-district -f ./district-2022.csv -with-csv=true
 ```
 
 # 生成 sql 插入语句：
 
 ```shell
-./district_tool -f ./district-2022.csv -with-sql=true
+mooon-district -f ./district-2022.csv -with-sql=true
 ```
 
 使用时，可同时指定：-with-json=true、-with-csv=true 和 -with-sql=true：
 
 ```shell
-./district_tool -f ./district-2022.csv -with-sql=true -with-csv=true -with-json=true
+mooon-district -f ./district-2022.csv -with-sql=true -with-csv=true -with-json=true
 ```
 
 # 特别说明
