@@ -2,9 +2,7 @@
 package main
 
 import (
-    "bufio"
     "context"
-    "encoding/json"
     "flag"
     "fmt"
     "github.com/eyjian/mooon-district/district"
@@ -40,13 +38,13 @@ func main() {
     done := false
     if *withJson {
         done = true
-        if !generateJson(districtTable) {
+        if !district.GenerateJson(districtTable) {
             os.Exit(3)
         }
     }
     if *withCsv {
         done = true
-        if !generateCsv(districtTable) {
+        if !district.GenerateCsv(districtTable, *csvDelimiter) {
             os.Exit(3)
         }
     }
@@ -63,85 +61,6 @@ func usage() {
 func checkParameters() bool {
     if len(*districtDataFile) == 0 {
         fmt.Fprintf(os.Stderr, "Parameter -f is not set.\n")
-        return false
-    }
-
-    return true
-}
-
-func createFile(filepath string) (*os.File, *bufio.Writer) {
-    file, err := os.Create(filepath)
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Create file://%s error: %s.\n", filepath, err.Error())
-        return nil, nil
-    }
-
-    return file, bufio.NewWriter(file)
-}
-
-func generateJson(districtTable *district.Table) bool {
-    jsonBytes, err := json.Marshal(*districtTable)
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
-        return false
-    }
-
-    filepath := "district.json"
-    file, writer := createFile(filepath)
-    if file == nil {
-        return false
-    }
-    defer file.Close()
-
-    _, err = writer.WriteString(string(jsonBytes))
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-        return false
-    }
-    err = writer.Flush()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
-        return false
-    }
-
-    return true
-}
-
-func generateCsv(districtTable *district.Table) bool {
-    filepath := "district.csv"
-    file, writer := createFile(filepath)
-    if file == nil {
-        return false
-    }
-    defer file.Close()
-
-    for _, provinceDistrict := range districtTable.Provinces {
-        for _, cityDistrict := range provinceDistrict.Cities {
-            if provinceDistrict.Municipality {
-                _, err := writer.WriteString(fmt.Sprintf("%s%s%s\n",
-                    provinceDistrict.Name, *csvDelimiter,
-                    cityDistrict.Name))
-                if err != nil {
-                    fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                    return false
-                }
-            } else {
-                for _, countyDistrict := range cityDistrict.Counties {
-                    _, err := writer.WriteString(fmt.Sprintf("%s%s%s%s%s\n",
-                        provinceDistrict.Name, *csvDelimiter,
-                        cityDistrict.Name, *csvDelimiter,
-                        countyDistrict.Name))
-                    if err != nil {
-                        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                        return false
-                    }
-                }
-            }
-        }
-    }
-    err := writer.Flush()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
         return false
     }
 

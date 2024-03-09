@@ -5,6 +5,7 @@ package district
 import (
     "bufio"
     "context"
+    "encoding/json"
     "fmt"
     "io"
     "os"
@@ -146,6 +147,75 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
     return &districtTable, nil
 }
 
+func GenerateJson(districtTable *Table) bool {
+    jsonBytes, err := json.Marshal(*districtTable)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
+        return false
+    }
+
+    filepath := "district.json"
+    file, writer := createFile(filepath)
+    if file == nil {
+        return false
+    }
+    defer file.Close()
+
+    _, err = writer.WriteString(string(jsonBytes))
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+        return false
+    }
+    err = writer.Flush()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
+        return false
+    }
+
+    return true
+}
+
+func GenerateCsv(districtTable *Table, csvDelimiter string) bool {
+    filepath := "district.csv"
+    file, writer := createFile(filepath)
+    if file == nil {
+        return false
+    }
+    defer file.Close()
+
+    for _, provinceDistrict := range districtTable.Provinces {
+        for _, cityDistrict := range provinceDistrict.Cities {
+            if provinceDistrict.Municipality {
+                _, err := writer.WriteString(fmt.Sprintf("%s%s%s\n",
+                    provinceDistrict.Name, csvDelimiter,
+                    cityDistrict.Name))
+                if err != nil {
+                    fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+                    return false
+                }
+            } else {
+                for _, countyDistrict := range cityDistrict.Counties {
+                    _, err := writer.WriteString(fmt.Sprintf("%s%s%s%s%s\n",
+                        provinceDistrict.Name, csvDelimiter,
+                        cityDistrict.Name, csvDelimiter,
+                        countyDistrict.Name))
+                    if err != nil {
+                        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+                        return false
+                    }
+                }
+            }
+        }
+    }
+    err := writer.Flush()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
+        return false
+    }
+
+    return true
+}
+
 func parseLine(lineNo int, line string) (*District, error) {
     // 使用逗号分隔每行数据
     parts := strings.Split(line, ",")
@@ -235,4 +305,14 @@ func perfectTable(table *Table) {
     sort.Slice(table.Provinces, func(i, j int) bool {
         return table.Provinces[i].Code < table.Provinces[j].Code
     })
+}
+
+func createFile(filepath string) (*os.File, *bufio.Writer) {
+    file, err := os.Create(filepath)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Create file://%s error: %s.\n", filepath, err.Error())
+        return nil, nil
+    }
+
+    return file, bufio.NewWriter(file)
 }
