@@ -12,14 +12,18 @@ import (
 var (
     help             = flag.Bool("h", false, "Display a help message and exit.")
     districtDataFile = flag.String("f", "", "File that stores district data.")
-    withJson         = flag.Bool("with-json", false, "Whether to generate json format data.")
-    withCsv          = flag.Bool("with-csv", false, "Whether to generate csv format data.")
-    withSql          = flag.Bool("with-sql", false, "Whether to generate sql data.")
-    withJsonIndent   = flag.Bool("with-json-indent", true, "Whether JSON format is indented.")
-    jsonIndent       = flag.String("json-indent", "  ", "Json indent when -with-json-indent is enabled.")
-    jsonPrefix       = flag.String("json-prefix", "", "Prefix for each line when -with-json-indent is enabled.")
-    csvDelimiter     = flag.String("csv-delimiter", ",", "Delimiter of csv data.")
-    csvWithCode      = flag.Bool("csv-with-code", true, "Whether the csv format outputs the code column.")
+
+    withJson       = flag.Bool("with-json", false, "Whether to generate json format data.")
+    withJsonIndent = flag.Bool("with-json-indent", true, "Whether JSON format is indented.")
+    jsonIndent     = flag.String("json-indent", "  ", "Json indent when -with-json-indent is enabled.")
+    jsonPrefix     = flag.String("json-prefix", "", "Prefix for each line when -with-json-indent is enabled.")
+
+    withCsv      = flag.Bool("with-csv", false, "Whether to generate csv format data.")
+    csvDelimiter = flag.String("csv-delimiter", ",", "Delimiter of csv data.")
+    csvWithCode  = flag.Bool("csv-with-code", true, "Whether the csv format outputs the code column.")
+
+    withSql  = flag.Bool("with-sql", false, "Whether to generate sql data.")
+    sqlTable = flag.String("sql-table", "t_dict_district", "Table name for sql data.")
 )
 
 func main() {
@@ -52,6 +56,12 @@ func main() {
             os.Exit(3)
         }
     }
+    if *withSql {
+        done = true
+        if !district.GenerateSql(districtTable, "example.sql", *sqlTable) {
+            os.Exit(3)
+        }
+    }
     if !done {
         fmt.Fprintf(os.Stderr, "Do nothing.\n")
         os.Exit(4)
@@ -68,5 +78,11 @@ func checkParameters() bool {
         return false
     }
 
+    if *withSql {
+        if len(*sqlTable) == 0 {
+            fmt.Fprintf(os.Stderr, "Parameter -sql-table is not set.\n")
+            return false
+        }
+    }
     return true
 }
