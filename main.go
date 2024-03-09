@@ -15,6 +15,9 @@ var (
     withJson         = flag.Bool("with-json", false, "Whether to generate json data.")
     withCsv          = flag.Bool("with-csv", false, "Whether to generate csv data.")
     withSql          = flag.Bool("with-sql", false, "Whether to generate sql data.")
+    withJsonIndent   = flag.Bool("with-json-indent", true, "Whether JSON format is indented.")
+    jsonIndent       = flag.String("json-indent", "  ", "Json indent when -with-json-indent is enabled.")
+    jsonPrefix       = flag.String("json-prefix", "", "Prefix for each line when -with-json-indent is enabled.")
     csvDelimiter     = flag.String("csv-delimiter", ",", "Delimiter of csv data.")
 )
 
@@ -38,7 +41,7 @@ func main() {
     done := false
     if *withJson {
         done = true
-        if !district.GenerateJson(districtTable, "example.json") {
+        if !district.GenerateJson(districtTable, "example.json", *withJsonIndent, *jsonIndent, *jsonPrefix) {
             os.Exit(3)
         }
     }

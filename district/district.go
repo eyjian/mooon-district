@@ -147,9 +147,16 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
     return &districtTable, nil
 }
 
-func GenerateJson(districtTable *Table, jsonFilepath string) bool {
+func GenerateJson(districtTable *Table, jsonFilepath string, withIndent bool, indent, prefix string) bool {
+    var err error
+    var jsonBytes []byte
     filepath := jsonFilepath
-    jsonBytes, err := json.Marshal(*districtTable)
+
+    if !withIndent {
+        jsonBytes, err = json.Marshal(*districtTable)
+    } else {
+        jsonBytes, err = json.MarshalIndent(*districtTable, prefix, indent)
+    }
     if err != nil {
         fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
         return false
