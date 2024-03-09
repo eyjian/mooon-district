@@ -20,12 +20,12 @@ type DistrictCode struct {
     CountyCode   uint32 `gorm:"column:f_county_code" json:"county_code,omitempty"`
 }
 
-// GetDistrictId 通过行政区名取得行政区代码
+// GetDistrictCode 通过行政区名取得行政区代码
 // 返回值：
 // 1）成功返回非 nil 的 DistrictCode，同时 error 值为 nil ；
 // 2）不存在返回 nil 的 DistrictCode，同时 error 值为 nil ；
 // 3）出错返回 nil 的 DistrictCode，同时 error 值不为 nil 。
-func GetDistrictId(ctx context.Context, db *gorm.DB, tableName string, name *DistrictName) (*DistrictCode, error) {
+func GetDistrictCode(ctx context.Context, db *gorm.DB, tableName string, name *DistrictName) (*DistrictCode, error) {
     var result DistrictCode
     err := db.Table(tableName).
         Select("f_province_code", "f_city_code", "f_county_code").
