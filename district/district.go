@@ -13,7 +13,8 @@ import (
 )
 
 type Table struct {
-    ProvinceDistrictTable map[uint32]ProvinceDistrict `json:"province_table"`
+    ProvinceDistrictTable map[uint32]ProvinceDistrict `json:"-"`
+    Provinces             []ProvinceDistrict          `json:"provinces,omitempty"`
 }
 
 // ProvinceDistrict 省/自治区/直辖市
@@ -22,7 +23,8 @@ type ProvinceDistrict struct {
     Name              string                  `json:"name"`         // 行政区名称
     Level             uint32                  `json:"level"`        // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
     Municipality      bool                    `json:"municipality"` // 直辖市
-    CityDistrictTable map[uint32]CityDistrict `json:"city_table,omitempty"`
+    CityDistrictTable map[uint32]CityDistrict `json:"-"`
+    Cities            []CityDistrict          `json:"cities"`
 }
 
 // CityDistrict 市/州/盟
@@ -31,7 +33,8 @@ type CityDistrict struct {
     Name                string              `json:"name"`        // 行政区名称
     Level               uint32              `json:"level"`       // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
     CountyCity          bool                `json:"county_city"` // 县级市
-    CountyDistrictTable map[uint32]District `json:"county_table,omitempty"`
+    CountyDistrictTable map[uint32]District `json:"-"`
+    Counties            []District          `json:"counties"`
 }
 
 type District struct {
@@ -138,6 +141,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
         }
     }
 
+    perfectTable(&districtTable)
     return &districtTable, nil
 }
 
@@ -209,4 +213,16 @@ func getProvinceDistrictCode(code uint32) uint32 {
 
 func getCityDistrictCode(code uint32) uint32 {
     return (code / 100) * 100
+}
+
+func perfectTable(table *Table) {
+    for _, provinceDistrict := range table.ProvinceDistrictTable {
+        for _, cityDistrict := range provinceDistrict.CityDistrictTable {
+            for _, countyDistrict := range cityDistrict.CountyDistrictTable {
+                cityDistrict.Counties = append(cityDistrict.Counties, countyDistrict)
+            }
+            provinceDistrict.Cities = append(provinceDistrict.Cities, cityDistrict)
+        }
+        table.Provinces = append(table.Provinces, provinceDistrict)
+    }
 }
