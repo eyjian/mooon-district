@@ -92,6 +92,8 @@ func TestGetDistrictName(t *testing.T) {
             CountyCode:   440402,
         }
         queryDistrictName(t, ctx, query, tableName, code, 1)
+        queryDistrictName(t, ctx, query, tableName, code, 1)
+        queryDistrictName(t, ctx, query, tableName, code, 1)
 
         code.CountyCode = 4404020
         queryDistrictName(t, ctx, query, tableName, code, 2)
