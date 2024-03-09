@@ -193,35 +193,33 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
 
     for _, provinceDistrict := range districtTable.Provinces {
         for _, cityDistrict := range provinceDistrict.Cities {
-            if provinceDistrict.Municipality {
+            if !withCode {
+                _, err = writer.WriteString(fmt.Sprintf("%s%s%s\n",
+                    provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
+            } else {
+                _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s\n",
+                    provinceDistrict.Code, csvDelimiter,
+                    provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
+            }
+            if err != nil {
+                fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+                return false
+            }
+
+            for _, countyDistrict := range cityDistrict.Counties {
                 if !withCode {
-                    _, err = writer.WriteString(fmt.Sprintf("%s%s%s\n",
-                        provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
+                    _, err = writer.WriteString(fmt.Sprintf("%s%s%s%s%s\n",
+                        provinceDistrict.Name, csvDelimiter,
+                        cityDistrict.Name, csvDelimiter, countyDistrict.Name))
                 } else {
-                    _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s\n",
+                    _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s%s%s\n",
                         provinceDistrict.Code, csvDelimiter,
-                        provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
+                        provinceDistrict.Name, csvDelimiter,
+                        cityDistrict.Name, csvDelimiter, countyDistrict.Name))
                 }
                 if err != nil {
                     fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
                     return false
-                }
-            } else {
-                for _, countyDistrict := range cityDistrict.Counties {
-                    if !withCode {
-                        _, err = writer.WriteString(fmt.Sprintf("%s%s%s%s%s\n",
-                            provinceDistrict.Name, csvDelimiter,
-                            cityDistrict.Name, csvDelimiter, countyDistrict.Name))
-                    } else {
-                        _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s%s%s\n",
-                            provinceDistrict.Code, csvDelimiter,
-                            provinceDistrict.Name, csvDelimiter,
-                            cityDistrict.Name, csvDelimiter, countyDistrict.Name))
-                    }
-                    if err != nil {
-                        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                        return false
-                    }
                 }
             }
         }
@@ -237,6 +235,7 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
 
 func GenerateSql(districtTable *Table, sqlFilepath, tableName string) bool {
     var err error
+    var builder strings.Builder
     filepath := sqlFilepath
     file, writer := createFile(filepath)
     if file == nil {
@@ -244,41 +243,34 @@ func GenerateSql(districtTable *Table, sqlFilepath, tableName string) bool {
     }
     defer file.Close()
 
-    _, err = writer.WriteString(fmt.Sprintf("INSERT INTO %s VALUES \n", tableName))
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-        return false
-    }
+    builder.WriteString(fmt.Sprintf("INSERT INTO %s VALUES \n", tableName))
     for _, provinceDistrict := range districtTable.Provinces {
         // 省/自治区/直辖市
         line := fmt.Sprintf("(%d,%d,'%s',%d),\n", provinceDistrict.Code, 0, provinceDistrict.Name, provinceDistrict.Level)
-        _, err = writer.WriteString(line)
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-            return false
-        }
+        builder.WriteString(line)
 
         for _, cityDistrict := range provinceDistrict.Cities {
             // 市/州/盟
             line := fmt.Sprintf("(%d,%d,'%s',%d),\n", cityDistrict.Code, provinceDistrict.Code, cityDistrict.Name, cityDistrict.Level)
-            _, err = writer.WriteString(line)
-            if err != nil {
-                fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                return false
-            }
+            builder.WriteString(line)
 
             for _, countyDistrict := range cityDistrict.Counties {
                 // 县/县级市/旗
                 line := fmt.Sprintf("(%d,%d,'%s',%d),\n", countyDistrict.Code, cityDistrict.Code, countyDistrict.Name, countyDistrict.Level)
-                _, err = writer.WriteString(line)
-                if err != nil {
-                    fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                    return false
-                }
+                builder.WriteString(line)
             }
 
         }
     }
+
+    sql := strings.Trim(builder.String(), "\n")
+    sql = strings.Trim(sql, ",")
+    _, err = writer.WriteString(sql)
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
+        return false
+    }
+
     err = writer.Flush()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
