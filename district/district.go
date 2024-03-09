@@ -13,7 +13,7 @@ import (
 )
 
 type Table struct {
-    ProvinceDistrictTable map[uint32]ProvinceDistrict `json:"province_list"`
+    ProvinceDistrictTable map[uint32]ProvinceDistrict `json:"province_table"`
 }
 
 // ProvinceDistrict 省/自治区/直辖市
@@ -22,7 +22,7 @@ type ProvinceDistrict struct {
     Name              string                  `json:"name"`         // 行政区名称
     Level             uint32                  `json:"level"`        // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
     Municipality      bool                    `json:"municipality"` // 直辖市
-    CityDistrictTable map[uint32]CityDistrict `json:"city_list,omitempty"`
+    CityDistrictTable map[uint32]CityDistrict `json:"city_table,omitempty"`
 }
 
 // CityDistrict 市/州/盟
@@ -31,7 +31,7 @@ type CityDistrict struct {
     Name                string              `json:"name"`        // 行政区名称
     Level               uint32              `json:"level"`       // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
     CountyCity          bool                `json:"county_city"` // 县级市
-    CountyDistrictTable map[uint32]District `json:"county_list,omitempty"`
+    CountyDistrictTable map[uint32]District `json:"county_table,omitempty"`
 }
 
 type District struct {
