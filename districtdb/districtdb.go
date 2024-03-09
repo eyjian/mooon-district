@@ -41,3 +41,25 @@ func GetDistrictCode(ctx context.Context, db *gorm.DB, tableName string, name *D
 
     return &result, nil
 }
+
+// GetDistrictName 通过行政区代码取得行政区名
+// 返回值：
+// 1）成功返回非 nil 的 DistrictName，同时 error 值为 nil ；
+// 2）不存在返回 nil 的 DistrictName，同时 error 值为 nil ；
+// 3）出错返回 nil 的 DistrictName，同时 error 值不为 nil 。
+func GetDistrictName(ctx context.Context, db *gorm.DB, tableName string, code *DistrictCode) (*DistrictName, error) {
+    var result DistrictName
+    err := db.Table(tableName).
+        Select("f_province_name", "f_city_name", "f_county_name").
+        Where("f_province_code = ? AND f_city_code = ? AND f_county_code = ?", code.ProvinceCode, code.CityCode, code.CountyCode).
+        First(&result).Error
+
+    if err != nil {
+        if err == gorm.ErrRecordNotFound {
+            return nil, nil // 不存在
+        }
+        return nil, err
+    }
+
+    return &result, nil
+}
