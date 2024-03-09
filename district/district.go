@@ -117,13 +117,13 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                     if districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable == nil {
                         // 省直辖县级市（济源市，河南省直辖县级市；五指山市，海南省直辖县级市）
                         cityDistrict := CityDistrict{
-                            Code:                district.Code,
-                            Name:                district.Name,
-                            Level:               district.Level,
-                            CountyDistrictTable: make(map[uint32]District),
-                            CountyCity:          true,
+                            Code:  district.Code,
+                            Name:  district.Name,
+                            Level: district.Level,
+                            //CountyDistrictTable: make(map[uint32]District),
+                            CountyCity: true,
                         }
-                        districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode] = cityDistrict
+                        districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[district.Code] = cityDistrict
                     } else {
                         // 县/县级市/旗
                         districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable[district.Code] = *district

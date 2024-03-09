@@ -12564,30 +12564,25 @@
           "code": 429004,
           "name": "仙桃市",
           "level": 3,
-          "county_city": true,
-          "counties": [
-            {
-              "code": 429005,
-              "name": "潜江市",
-              "level": 3,
-              "parent": 429000,
-              "grandparent": 420000
-            },
-            {
-              "code": 429006,
-              "name": "天门市",
-              "level": 3,
-              "parent": 429000,
-              "grandparent": 420000
-            },
-            {
-              "code": 429021,
-              "name": "神农架林区",
-              "level": 3,
-              "parent": 429000,
-              "grandparent": 420000
-            }
-          ]
+          "county_city": true
+        },
+        {
+          "code": 429005,
+          "name": "潜江市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 429006,
+          "name": "天门市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 429021,
+          "name": "神农架林区",
+          "level": 3,
+          "county_city": true
         }
       ]
     },
@@ -15582,107 +15577,91 @@
           "code": 469001,
           "name": "五指山市",
           "level": 3,
-          "county_city": true,
-          "counties": [
-            {
-              "code": 469002,
-              "name": "琼海市",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469005,
-              "name": "文昌市",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469006,
-              "name": "万宁市",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469007,
-              "name": "东方市",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469021,
-              "name": "定安县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469022,
-              "name": "屯昌县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469023,
-              "name": "澄迈县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469024,
-              "name": "临高县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469025,
-              "name": "白沙黎族自治县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469026,
-              "name": "昌江黎族自治县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469027,
-              "name": "乐东黎族自治县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469028,
-              "name": "陵水黎族自治县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469029,
-              "name": "保亭黎族苗族自治县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            },
-            {
-              "code": 469030,
-              "name": "琼中黎族苗族自治县",
-              "level": 3,
-              "parent": 469000,
-              "grandparent": 460000
-            }
-          ]
+          "county_city": true
+        },
+        {
+          "code": 469002,
+          "name": "琼海市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469005,
+          "name": "文昌市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469006,
+          "name": "万宁市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469007,
+          "name": "东方市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469021,
+          "name": "定安县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469022,
+          "name": "屯昌县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469023,
+          "name": "澄迈县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469024,
+          "name": "临高县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469025,
+          "name": "白沙黎族自治县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469026,
+          "name": "昌江黎族自治县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469027,
+          "name": "乐东黎族自治县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469028,
+          "name": "陵水黎族自治县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469029,
+          "name": "保亭黎族苗族自治县",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 469030,
+          "name": "琼中黎族苗族自治县",
+          "level": 3,
+          "county_city": true
         }
       ]
     },
@@ -22629,79 +22608,67 @@
           "code": 659001,
           "name": "石河子市",
           "level": 3,
-          "county_city": true,
-          "counties": [
-            {
-              "code": 659002,
-              "name": "阿拉尔市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659003,
-              "name": "图木舒克市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659004,
-              "name": "五家渠市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659005,
-              "name": "北屯市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659006,
-              "name": "铁门关市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659007,
-              "name": "双河市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659008,
-              "name": "可克达拉市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659009,
-              "name": "昆玉市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659010,
-              "name": "胡杨河市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            },
-            {
-              "code": 659011,
-              "name": "新星市",
-              "level": 3,
-              "parent": 659000,
-              "grandparent": 650000
-            }
-          ]
+          "county_city": true
+        },
+        {
+          "code": 659002,
+          "name": "阿拉尔市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659003,
+          "name": "图木舒克市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659004,
+          "name": "五家渠市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659005,
+          "name": "北屯市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659006,
+          "name": "铁门关市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659007,
+          "name": "双河市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659008,
+          "name": "可克达拉市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659009,
+          "name": "昆玉市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659010,
+          "name": "胡杨河市",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 659011,
+          "name": "新星市",
+          "level": 3,
+          "county_city": true
         }
       ]
     },
