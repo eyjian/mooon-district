@@ -26,7 +26,7 @@ type ProvinceDistrict struct {
     Level             uint32                  `json:"level"`        // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
     Municipality      bool                    `json:"municipality"` // 直辖市
     CityDistrictTable map[uint32]CityDistrict `json:"-"`
-    Cities            []CityDistrict          `json:"cities"`
+    Cities            []CityDistrict          `json:"cities,omitempty"`
 }
 
 // CityDistrict 市/州/盟
@@ -36,7 +36,7 @@ type CityDistrict struct {
     Level               uint32              `json:"level"`       // 行政区级别（1 省/自治区/直辖市，2 市/州/盟，3 县/县级市/旗）
     CountyCity          bool                `json:"county_city"` // 县级市
     CountyDistrictTable map[uint32]District `json:"-"`
-    Counties            []District          `json:"counties"`
+    Counties            []District          `json:"counties,omitempty"`
 }
 
 type District struct {
