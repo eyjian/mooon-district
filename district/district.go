@@ -243,20 +243,34 @@ func GenerateSql(districtTable *Table, sqlFilepath, tableName string) bool {
     }
     defer file.Close()
 
+    // 要求的表格式：
+    builder.WriteString("/*\n")
+    builder.WriteString("DROP TABLE t_dict_district;\n")
+    builder.WriteString("CREATE TABLE t_dict_district (\n")
+    builder.WriteString("  f_province_code INT UNSIGNED NOT NULL,\n")
+    builder.WriteString("  f_city_code INT UNSIGNED NOT NULL,\n")
+    builder.WriteString("  f_county_code INT UNSIGNED NOT NULL,\n")
+    builder.WriteString("  f_level TINYINT UNSIGNED NOT NULL,\n")
+    builder.WriteString("  f_name VARCHAR(20) NOT NULL,\n")
+    builder.WriteString("  PRIMARY KEY (f_province_code,f_city_code,f_county_code),\n")
+    builder.WriteString("  KEY (f_name)\n")
+    builder.WriteString(") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n")
+    builder.WriteString("*/\n")
+
     builder.WriteString(fmt.Sprintf("INSERT INTO %s VALUES \n", tableName))
     for _, provinceDistrict := range districtTable.Provinces {
         // 省/自治区/直辖市
-        line := fmt.Sprintf("(%d,%d,'%s',%d),\n", provinceDistrict.Code, 0, provinceDistrict.Name, provinceDistrict.Level)
+        line := fmt.Sprintf("(%d,%d,%d,%d,'%s'),\n", provinceDistrict.Code, 0, 0, provinceDistrict.Level, provinceDistrict.Name)
         builder.WriteString(line)
 
         for _, cityDistrict := range provinceDistrict.Cities {
             // 市/州/盟
-            line := fmt.Sprintf("(%d,%d,'%s',%d),\n", cityDistrict.Code, provinceDistrict.Code, cityDistrict.Name, cityDistrict.Level)
+            line := fmt.Sprintf("(%d,%d,%d,%d,'%s'),\n", provinceDistrict.Code, cityDistrict.Code, 0, cityDistrict.Level, cityDistrict.Name)
             builder.WriteString(line)
 
             for _, countyDistrict := range cityDistrict.Counties {
                 // 县/县级市/旗
-                line := fmt.Sprintf("(%d,%d,'%s',%d),\n", countyDistrict.Code, cityDistrict.Code, countyDistrict.Name, countyDistrict.Level)
+                line := fmt.Sprintf("(%d,%d,%d,%d,'%s'),\n", provinceDistrict.Code, cityDistrict.Code, countyDistrict.Code, countyDistrict.Level, countyDistrict.Name)
                 builder.WriteString(line)
             }
 
@@ -265,6 +279,7 @@ func GenerateSql(districtTable *Table, sqlFilepath, tableName string) bool {
 
     sql := strings.Trim(builder.String(), "\n")
     sql = strings.Trim(sql, ",")
+    sql = sql + ";"
     _, err = writer.WriteString(sql)
     if err != nil {
         fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
