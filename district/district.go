@@ -147,7 +147,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
     return &districtTable, nil
 }
 
-func GenerateJson(districtTable *Table, jsonFilepath string, withIndent bool, indent, prefix string) bool {
+func GenerateJson(districtTable *Table, jsonFilepath string, withIndent bool, indent, prefix string) error {
     var err error
     var jsonBytes []byte
     filepath := jsonFilepath
@@ -158,36 +158,33 @@ func GenerateJson(districtTable *Table, jsonFilepath string, withIndent bool, in
         jsonBytes, err = json.MarshalIndent(*districtTable, prefix, indent)
     }
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Json marshal error: %s.\n", err.Error())
-        return false
+        return fmt.Errorf("json marshal error: %s", err.Error())
     }
 
     file, writer := createFile(filepath)
     if file == nil {
-        return false
+        return fmt.Errorf("create file://%s error: %s", filepath, err.Error())
     }
     defer file.Close()
 
     _, err = writer.WriteString(string(jsonBytes))
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-        return false
+        return fmt.Errorf("write file://%s error: %s", filepath, err.Error())
     }
     err = writer.Flush()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
-        return false
+        return fmt.Errorf("flush file://%s error: %s", filepath, err.Error())
     }
 
-    return true
+    return nil
 }
 
-func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCode bool) bool {
+func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCode bool) error {
     var err error
     filepath := csvFilepath
     file, writer := createFile(filepath)
     if file == nil {
-        return false
+        return fmt.Errorf("create file://%s error: %s", filepath, err.Error())
     }
     defer file.Close()
 
@@ -202,8 +199,7 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
                     provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
             }
             if err != nil {
-                fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                return false
+                return fmt.Errorf("write file://%s error: %s", filepath, err.Error())
             }
 
             for _, countyDistrict := range cityDistrict.Counties {
@@ -218,28 +214,26 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
                         cityDistrict.Name, csvDelimiter, countyDistrict.Name))
                 }
                 if err != nil {
-                    fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-                    return false
+                    return fmt.Errorf("write file://%s error: %s", filepath, err.Error())
                 }
             }
         }
     }
     err = writer.Flush()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
-        return false
+        return fmt.Errorf("flush file://%s error: %s", filepath, err.Error())
     }
 
-    return true
+    return nil
 }
 
-func GenerateSql(districtTable *Table, sqlFilepath, tableName string) bool {
+func GenerateSql(districtTable *Table, sqlFilepath, tableName string) error {
     var err error
     var builder strings.Builder
     filepath := sqlFilepath
     file, writer := createFile(filepath)
     if file == nil {
-        return false
+        return fmt.Errorf("create file://%s error: %s", filepath, err.Error())
     }
     defer file.Close()
 
@@ -282,17 +276,15 @@ func GenerateSql(districtTable *Table, sqlFilepath, tableName string) bool {
     sql = sql + ";"
     _, err = writer.WriteString(sql)
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Write file://%s error: %s.\n", filepath, err.Error())
-        return false
+        return fmt.Errorf("write file://%s error: %s", filepath, err.Error())
     }
 
     err = writer.Flush()
     if err != nil {
-        fmt.Fprintf(os.Stderr, "Flush file://%s error: %s.\n", filepath, err.Error())
-        return false
+        return fmt.Errorf("flush file://%s error: %s", filepath, err.Error())
     }
 
-    return true
+    return nil
 }
 
 func parseLine(lineNo int, line string) (*District, error) {

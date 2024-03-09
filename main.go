@@ -46,19 +46,25 @@ func main() {
     done := false
     if *withJson {
         done = true
-        if !district.GenerateJson(districtTable, "example.json", *withJsonIndent, *jsonIndent, *jsonPrefix) {
+        err := district.GenerateJson(districtTable, "example.json", *withJsonIndent, *jsonIndent, *jsonPrefix)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Generate json error: %s.\n", err.Error())
             os.Exit(3)
         }
     }
     if *withCsv {
         done = true
-        if !district.GenerateCsv(districtTable, "example.csv", *csvDelimiter, *csvWithCode) {
+        err := district.GenerateCsv(districtTable, "example.csv", *csvDelimiter, *csvWithCode)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Generate csv error: %s.\n", err.Error())
             os.Exit(3)
         }
     }
     if *withSql {
         done = true
-        if !district.GenerateSql(districtTable, "example.sql", *sqlTable) {
+        err := district.GenerateSql(districtTable, "example.sql", *sqlTable)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Generate sql error: %s.\n", err.Error())
             os.Exit(3)
         }
     }
