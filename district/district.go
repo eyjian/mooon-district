@@ -181,6 +181,7 @@ func GenerateJson(districtTable *Table, jsonFilepath string, withIndent bool, in
 
 func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCode bool) error {
     var err error
+    var builder strings.Builder
     filepath := csvFilepath
     file, writer := createFile(filepath)
     if file == nil {
@@ -190,30 +191,27 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
 
     for _, provinceDistrict := range districtTable.Provinces {
         if !withCode {
-            writer.WriteString(fmt.Sprintf("%s\n", provinceDistrict.Name))
+            builder.WriteString(fmt.Sprintf("%s\n", provinceDistrict.Name))
         } else {
-            writer.WriteString(fmt.Sprintf("%d%s%s\n", provinceDistrict.Code, csvDelimiter, provinceDistrict.Name))
+            builder.WriteString(fmt.Sprintf("%d%s%s\n", provinceDistrict.Code, csvDelimiter, provinceDistrict.Name))
         }
         for _, cityDistrict := range provinceDistrict.Cities {
             if !withCode {
-                _, err = writer.WriteString(fmt.Sprintf("%s%s%s\n",
+                builder.WriteString(fmt.Sprintf("%s%s%s\n",
                     provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
             } else {
-                _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s\n",
+                builder.WriteString(fmt.Sprintf("%d%s%s%s%s\n",
                     cityDistrict.Code, csvDelimiter,
                     provinceDistrict.Name, csvDelimiter, cityDistrict.Name))
-            }
-            if err != nil {
-                return fmt.Errorf("write file://%s error: %s", filepath, err.Error())
             }
 
             for _, countyDistrict := range cityDistrict.Counties {
                 if !withCode {
-                    _, err = writer.WriteString(fmt.Sprintf("%s%s%s%s%s\n",
+                    builder.WriteString(fmt.Sprintf("%s%s%s%s%s\n",
                         provinceDistrict.Name, csvDelimiter,
                         cityDistrict.Name, csvDelimiter, countyDistrict.Name))
                 } else {
-                    _, err = writer.WriteString(fmt.Sprintf("%d%s%s%s%s%s%s\n",
+                    builder.WriteString(fmt.Sprintf("%d%s%s%s%s%s%s\n",
                         countyDistrict.Code, csvDelimiter,
                         provinceDistrict.Name, csvDelimiter,
                         cityDistrict.Name, csvDelimiter, countyDistrict.Name))
@@ -223,6 +221,10 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
                 }
             }
         }
+    }
+    _, err = writer.WriteString(builder.String())
+    if err != nil {
+        return fmt.Errorf("write file://%s error: %s", filepath, err.Error())
     }
     err = writer.Flush()
     if err != nil {
