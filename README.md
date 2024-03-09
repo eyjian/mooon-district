@@ -35,7 +35,11 @@ go install github.com/eyjian/mooon-district@latest
 ./district_tool -f ./district-2022.csv -with-sql=true
 ```
 
-使用时，可同时指定：-with-json=true、-with-csv=true 和 -with-sql=true 。
+使用时，可同时指定：-with-json=true、-with-csv=true 和 -with-sql=true：
+
+```shell
+./district_tool -f ./district-2022.csv -with-sql=true -with-csv=true -with-json=true
+```
 
 # 特别说明
 
