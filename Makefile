@@ -1,6 +1,6 @@
 all: district_tool
 
-district_tool: main.go
+district_tool: main.go district/district.go
 	go build -o $@ $<
 
 .PHONY: clean
