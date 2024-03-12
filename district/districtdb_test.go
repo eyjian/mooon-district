@@ -21,7 +21,7 @@ func TestGetDistrictCode(t *testing.T) {
         t.Error("failed to connect database")
     } else {
         tableName := "t_dict_district"
-        query := NewQuery(db, tableName)
+        query := NewQuery(db, tableName, 3600)
         name := &Name{
             ProvinceName: "广东省",
             CityName:     "珠海市",
@@ -85,7 +85,7 @@ func TestGetDistrictName(t *testing.T) {
         t.Error("failed to connect database")
     } else {
         tableName := "t_dict_district"
-        query := NewQuery(db, tableName)
+        query := NewQuery(db, tableName, 3600)
         code := &Code{
             ProvinceCode: 440000,
             CityCode:     440400,
