@@ -57,11 +57,11 @@ func init() {
     debug.SetGCPercent(20)
 }
 
-func NewQuery(db *gorm.DB, tableName string) *Query {
+func NewQuery(db *gorm.DB, tableName string, expireSeconds int) *Query {
     return &Query{
         Db:            db,
         TableName:     tableName,
-        ExpireSeconds: 3600 * 12,
+        ExpireSeconds: expireSeconds,
     }
 }
 
