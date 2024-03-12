@@ -1,6 +1,6 @@
-// Package districtdb
+// Package district
 // Wrote by yijian on 2024/03/09
-package districtdb
+package district
 
 import (
     "context"
@@ -38,14 +38,14 @@ type CacheMetric struct {
     HitRate           float64 `json:"hit_rate"`
 }
 
-// DistrictName 行政区名（字符集需同 DB 等保持一致）
-type DistrictName struct {
+// Name 行政区名（字符集需同 DB 等保持一致）
+type Name struct {
     ProvinceName string `gorm:"column:f_province_name" json:"province_name,omitempty"`
     CityName     string `gorm:"column:f_city_name" json:"city_name,omitempty"`
     CountyName   string `gorm:"column:f_county_name" json:"county_name,omitempty"`
 }
 
-type DistrictCode struct {
+type Code struct {
     ProvinceCode uint32 `gorm:"column:f_province_code" json:"province_code,omitempty"`
     CityCode     uint32 `gorm:"column:f_city_code" json:"city_code,omitempty"`
     CountyCode   uint32 `gorm:"column:f_county_code" json:"county_code,omitempty"`
@@ -65,12 +65,12 @@ func NewQuery(db *gorm.DB, tableName string) *Query {
     }
 }
 
-func (d *DistrictName) Md5Sum() string {
+func (d *Name) Md5Sum() string {
     data := d.ProvinceName + ":" + d.CityName + ":" + d.CountyName
     return Md5Sum(data)
 }
 
-func (d *DistrictCode) Md5Sum() string {
+func (d *Code) Md5Sum() string {
     data := fmt.Sprintf("%d:%d:%d", d.ProvinceCode, d.CityCode, d.CountyCode)
     return Md5Sum(data)
 }
@@ -118,7 +118,7 @@ func GetCacheMetric() *CacheMetric {
 // 1）成功返回非 nil 的 DistrictCode，同时 error 值为 nil ；
 // 2）不存在返回 nil 的 DistrictCode，同时 error 值为 nil ；
 // 3）出错返回 nil 的 DistrictCode，同时 error 值不为 nil 。
-func (q *Query) GetDistrictCode(ctx context.Context, name *DistrictName) (*DistrictCode, error) {
+func (q *Query) GetDistrictCode(ctx context.Context, name *Name) (*Code, error) {
     code, err := q.getDistrictCodeFromCache(name)
     if err == nil {
         return code, nil
@@ -136,7 +136,7 @@ func (q *Query) GetDistrictCode(ctx context.Context, name *DistrictName) (*Distr
 // 1）成功返回非 nil 的 DistrictName，同时 error 值为 nil ；
 // 2）不存在返回 nil 的 DistrictName，同时 error 值为 nil ；
 // 3）出错返回 nil 的 DistrictName，同时 error 值不为 nil 。
-func (q *Query) GetDistrictName(ctx context.Context, code *DistrictCode) (*DistrictName, error) {
+func (q *Query) GetDistrictName(ctx context.Context, code *Code) (*Name, error) {
     name, err := q.getDistrictNameFromCache(code)
     if err == nil {
         return name, nil
@@ -149,8 +149,8 @@ func (q *Query) GetDistrictName(ctx context.Context, code *DistrictCode) (*Distr
     return name, err
 }
 
-func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *DistrictName) (*DistrictCode, error) {
-    var code DistrictCode
+func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *Name) (*Code, error) {
+    var code Code
     err := q.Db.Table(q.TableName).
         Select("f_province_code", "f_city_code", "f_county_code").
         Where("f_province_name = ? AND f_city_name = ? AND f_county_name = ?", name.ProvinceName, name.CityName, name.CountyName).
@@ -166,8 +166,8 @@ func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *DistrictName) (
     return &code, nil
 }
 
-func (q *Query) getDistrictNameFromDb(ctx context.Context, code *DistrictCode) (*DistrictName, error) {
-    var result DistrictName
+func (q *Query) getDistrictNameFromDb(ctx context.Context, code *Code) (*Name, error) {
+    var result Name
     err := q.Db.Table(q.TableName).
         Select("f_province_name", "f_city_name", "f_county_name").
         Where("f_province_code = ? AND f_city_code = ? AND f_county_code = ?", code.ProvinceCode, code.CityCode, code.CountyCode).
@@ -183,8 +183,8 @@ func (q *Query) getDistrictNameFromDb(ctx context.Context, code *DistrictCode) (
     return &result, nil
 }
 
-func (q *Query) getDistrictCodeFromCache(name *DistrictName) (*DistrictCode, error) {
-    var code DistrictCode
+func (q *Query) getDistrictCodeFromCache(name *Name) (*Code, error) {
+    var code Code
     cacheKey := name.Md5Sum()
     jsonBytes, err := districtCache.Get([]byte(cacheKey))
     if err != nil {
@@ -199,7 +199,7 @@ func (q *Query) getDistrictCodeFromCache(name *DistrictName) (*DistrictCode, err
     return &code, nil
 }
 
-func (q *Query) updateDistrictCodeToCache(name *DistrictName, code *DistrictCode) error {
+func (q *Query) updateDistrictCodeToCache(name *Name, code *Code) error {
     cacheKey := name.Md5Sum()
     jsonBytes, err := json.Marshal(*code)
     if err != nil {
@@ -214,8 +214,8 @@ func (q *Query) updateDistrictCodeToCache(name *DistrictName, code *DistrictCode
     return nil
 }
 
-func (q *Query) getDistrictNameFromCache(code *DistrictCode) (*DistrictName, error) {
-    var name DistrictName
+func (q *Query) getDistrictNameFromCache(code *Code) (*Name, error) {
+    var name Name
     cacheKey := code.Md5Sum()
     jsonBytes, err := districtCache.Get([]byte(cacheKey))
     if err != nil {
@@ -230,7 +230,7 @@ func (q *Query) getDistrictNameFromCache(code *DistrictCode) (*DistrictName, err
     return &name, nil
 }
 
-func (q *Query) updateDistrictNameToCache(code *DistrictCode, name *DistrictName) error {
+func (q *Query) updateDistrictNameToCache(code *Code, name *Name) error {
     cacheKey := code.Md5Sum()
     jsonBytes, err := json.Marshal(*name)
     if err != nil {
