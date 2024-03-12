@@ -1,6 +1,6 @@
-// Package districtdb
+// Package district
 // Wrote by yijian on 2024/03/09
-package districtdb
+package district
 
 import (
     "context"
@@ -22,7 +22,7 @@ func TestGetDistrictCode(t *testing.T) {
     } else {
         tableName := "t_dict_district"
         query := NewQuery(db, tableName)
-        name := &DistrictName{
+        name := &Name{
             ProvinceName: "广东省",
             CityName:     "珠海市",
             CountyName:   "香洲区",
@@ -86,7 +86,7 @@ func TestGetDistrictName(t *testing.T) {
     } else {
         tableName := "t_dict_district"
         query := NewQuery(db, tableName)
-        code := &DistrictCode{
+        code := &Code{
             ProvinceCode: 440000,
             CityCode:     440400,
             CountyCode:   440402,
@@ -127,7 +127,7 @@ func TestGetDistrictName(t *testing.T) {
 // 1）期待成功
 // 2）期待不存在
 // 3）期待出错
-func queryDistrictCode(t *testing.T, ctx context.Context, query *Query, tableName string, name *DistrictName, expect int) {
+func queryDistrictCode(t *testing.T, ctx context.Context, query *Query, tableName string, name *Name, expect int) {
     result, err := query.GetDistrictCode(ctx, name)
     if err != nil {
         if expect == 3 {
@@ -157,7 +157,7 @@ func queryDistrictCode(t *testing.T, ctx context.Context, query *Query, tableNam
 // 1）期待成功
 // 2）期待不存在
 // 3）期待出错
-func queryDistrictName(t *testing.T, ctx context.Context, query *Query, tableName string, code *DistrictCode, expect int) {
+func queryDistrictName(t *testing.T, ctx context.Context, query *Query, tableName string, code *Code, expect int) {
     result, err := query.GetDistrictName(ctx, code)
     if err != nil {
         if expect == 3 {
