@@ -91,7 +91,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
 
             provinceCode := getProvinceDistrictCode(district.Code)
             cityCode := getCityDistrictCode(district.Code)
-            if isProvinceDistrict(district.Code) {
+            if IsProvinceDistrictCode(district.Code) {
                 // 省/自治区/直辖市
                 provinceDistrict := ProvinceDistrict{
                     Code:              district.Code,
@@ -101,7 +101,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                     Municipality:      IsMunicipalityCode(district.Code),
                 }
                 districtTable.ProvinceDistrictTable[provinceCode] = provinceDistrict
-            } else if isCityDistrict(district.Code) {
+            } else if IsCityDistrictCode(district.Code) {
                 // 市/州/盟
                 cityDistrict := CityDistrict{
                     Code:                district.Code,
@@ -111,7 +111,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                     CountyCity:          false,
                 }
                 districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode] = cityDistrict
-            } else if isCountyDistrict(district.Code) {
+            } else if IsCountyDistrictCode(district.Code) {
                 if !IsMunicipalityCode(district.Code) {
                     // 非直辖市
                     if districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable == nil {
@@ -361,15 +361,15 @@ func IsMunicipalityCode(code uint32) bool {
             provinceCode == 500000 // 重庆市
 }
 
-func isProvinceDistrict(code uint32) bool {
+func IsProvinceDistrictCode(code uint32) bool {
     return code%10000 == 0
 }
 
-func isCityDistrict(code uint32) bool {
+func IsCityDistrictCode(code uint32) bool {
     return code%10000 != 0 && code%100 == 0
 }
 
-func isCountyDistrict(code uint32) bool {
+func IsCountyDistrictCode(code uint32) bool {
     return code%10000 != 0 && code%100 != 0
 }
 
