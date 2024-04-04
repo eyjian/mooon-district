@@ -98,7 +98,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                     Name:              district.Name,
                     Level:             district.Level,
                     CityDistrictTable: make(map[uint32]CityDistrict),
-                    Municipality:      isMunicipality(district.Code),
+                    Municipality:      IsMunicipalityCode(district.Code),
                 }
                 districtTable.ProvinceDistrictTable[provinceCode] = provinceDistrict
             } else if isCityDistrict(district.Code) {
@@ -112,7 +112,7 @@ func LoadDistrict(ctx context.Context, filepath string) (*Table, error) {
                 }
                 districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode] = cityDistrict
             } else if isCountyDistrict(district.Code) {
-                if !isMunicipality(district.Code) {
+                if !IsMunicipalityCode(district.Code) {
                     // 非直辖市
                     if districtTable.ProvinceDistrictTable[provinceCode].CityDistrictTable[cityCode].CountyDistrictTable == nil {
                         // 省直辖县级市（济源市，河南省直辖县级市；五指山市，海南省直辖县级市）
@@ -346,13 +346,19 @@ func parseLine(lineNo int, line string) (*District, error) {
     }, nil
 }
 
-// isMunicipality 是否为直辖市
-func isMunicipality(code uint32) bool {
+// IsHongKongMacauTaiwan 判断是否为香港/澳门/台湾
+func IsHongKongMacauTaiwan(name string) bool {
+    return name == "香港" || name == "澳门" || name == "台湾" ||
+            name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
+}
+
+// IsMunicipalityCode 是否为直辖市
+func IsMunicipalityCode(code uint32) bool {
     provinceCode := (code / 10000) * 10000
     return provinceCode == 110000 || // 北京市
-        provinceCode == 310000 || // 上海市
-        provinceCode == 120000 || // 天津市
-        provinceCode == 500000 // 重庆市
+            provinceCode == 310000 || // 上海市
+            provinceCode == 120000 || // 天津市
+            provinceCode == 500000 // 重庆市
 }
 
 func isProvinceDistrict(code uint32) bool {
