@@ -12,6 +12,7 @@ import (
     "gorm.io/gorm"
     "io"
     "runtime/debug"
+    "strconv"
     "strings"
 )
 
@@ -149,6 +150,20 @@ func (q *Query) GetDistrictName(ctx context.Context, code *Code) (*Name, error) 
     return name, err
 }
 
+// GetCountyCount 取得县/县级市/旗数，像东莞市没有
+func (q *Query) GetCountyCount(ctx context.Context, provinceName, cityName string) (int, error) {
+    count, err := q.getCountyCountFromCache(provinceName, cityName)
+    if err == nil {
+        return count, nil
+    }
+
+    count, err = q.getCountyCountFromDb(ctx, provinceName, cityName)
+    if err == nil {
+        q.updateCountyCountToCache(provinceName, cityName, count)
+    }
+    return count, err
+}
+
 func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *Name) (*Code, error) {
     var code Code
     err := q.Db.Table(q.TableName).
@@ -181,6 +196,20 @@ func (q *Query) getDistrictNameFromDb(ctx context.Context, code *Code) (*Name, e
     }
 
     return &result, nil
+}
+
+func (q *Query) getCountyCountFromDb(ctx context.Context, provinceName, cityName string) (int, error) {
+    var count int64
+
+    err := q.Db.Table(q.TableName).
+        Where("f_province_name = ? AND f_city_name = ?", provinceName, cityName).
+        Count(&count).
+        Error
+    if err != nil {
+        return 0, err
+    }
+
+    return int(count), nil
 }
 
 func (q *Query) getDistrictCodeFromCache(name *Name) (*Code, error) {
@@ -238,6 +267,35 @@ func (q *Query) updateDistrictNameToCache(code *Code, name *Name) error {
     }
 
     err = districtCache.Set([]byte(cacheKey), jsonBytes, q.ExpireSeconds)
+    if err != nil {
+        return fmt.Errorf("cache set error: %s", err.Error())
+    }
+
+    return nil
+}
+
+func (q *Query) getCountyCountFromCache(provinceName, cityName string) (int, error) {
+    key := "CountyCount:" + provinceName + ":" + cityName
+    cacheKey := Md5Sum(key)
+
+    data, err := districtCache.Get([]byte(cacheKey))
+    if err != nil {
+        return 0, fmt.Errorf("cache get error: %s", err.Error())
+    }
+
+    intValue, err := strconv.Atoi(string(data))
+    if err != nil {
+        return 0, fmt.Errorf("cache json strconv error: %s", err.Error())
+    }
+
+    return intValue, nil
+}
+
+func (q *Query) updateCountyCountToCache(provinceName, cityName string, countyCount int) error {
+    key := "CountyCount:" + provinceName + ":" + cityName
+    cacheKey := Md5Sum(key)
+
+    err := districtCache.Set([]byte(cacheKey), []byte(strconv.Itoa(countyCount)), q.ExpireSeconds)
     if err != nil {
         return fmt.Errorf("cache set error: %s", err.Error())
     }

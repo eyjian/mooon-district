@@ -4,6 +4,7 @@ package district
 
 import (
     "context"
+    "fmt"
     "gorm.io/driver/mysql"
     "gorm.io/gorm"
     "os"
@@ -119,6 +120,55 @@ func TestGetDistrictName(t *testing.T) {
         queryDistrictName(t, ctx, query, tableName, code, 2)
 
         CacheMetricFPrintf(os.Stdout)
+    }
+}
+
+// go test -v -run="TestGetCountyCount" -args 'username:password@tcp(host:port)/dbname?charset=utf8mb4'
+func TestGetCountyCount(t *testing.T) {
+    ctx := context.Background()
+    dsn := os.Args[len(os.Args)-1]
+    t.Logf("%s\n", dsn)
+
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err != nil {
+        t.Error("failed to connect database")
+    } else {
+        tableName := "t_ds_dict_district"
+        query := NewQuery(db, tableName, 3600)
+
+        provinceName := "广东省"
+        cityName := "深圳市"
+        count, err := query.GetCountyCount(ctx, provinceName, cityName)
+        if err != nil {
+            t.Errorf("GetCountyCount error: %s\n", err.Error())
+        } else if count > 1 {
+            t.Logf("%s%s: %d\n", provinceName, cityName, count)
+        } else {
+            t.Errorf("%s%s: %d\n", provinceName, cityName, count)
+        }
+
+        cityName = "东莞市"
+        count, err = query.GetCountyCount(ctx, provinceName, cityName)
+        if err != nil {
+            t.Errorf("GetCountyCount error: %s\n", err.Error())
+        } else if count == 1 {
+            t.Logf("%s%s: %d\n", provinceName, cityName, count)
+        } else {
+            t.Errorf("%s%s: %d\n", provinceName, cityName, count)
+        }
+
+        cityName = "东莞市"
+        count, err = query.GetCountyCount(ctx, provinceName, cityName)
+        if err != nil {
+            t.Errorf("GetCountyCount error: %s\n", err.Error())
+        } else if count == 1 {
+            t.Logf("%s%s: %d\n", provinceName, cityName, count)
+        } else {
+            t.Errorf("%s%s: %d\n", provinceName, cityName, count)
+        }
+
+        cacheMetric := GetCacheMetric()
+        fmt.Printf("%+v\n", *cacheMetric)
     }
 }
 
