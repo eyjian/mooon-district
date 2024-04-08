@@ -133,7 +133,7 @@ func TestGetCountyCount(t *testing.T) {
     if err != nil {
         t.Error("failed to connect database")
     } else {
-        tableName := "t_ds_dict_district"
+        tableName := "t_dict_district"
         query := NewQuery(db, tableName, 3600)
 
         provinceName := "广东省"
