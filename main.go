@@ -22,8 +22,9 @@ var (
     csvDelimiter = flag.String("csv-delimiter", ",", "Delimiter of csv data.")
     csvWithCode  = flag.Bool("csv-with-code", true, "Whether the csv format outputs the code column.")
 
-    withSql  = flag.Bool("with-sql", false, "Whether to generate sql data.")
-    sqlTable = flag.String("sql-table", "t_dict_district", "Table name for sql data.")
+    withSql       = flag.Bool("with-sql", false, "Whether to generate sql data.")
+    withSqlIgnore = flag.Bool("with-sql-ignore", false, "Use `INSERT IGNORE` to ignore existing.")
+    sqlTable      = flag.String("sql-table", "t_dict_district", "Table name for sql data.")
 )
 
 func main() {
@@ -62,7 +63,7 @@ func main() {
     }
     if *withSql {
         done = true
-        err := district.GenerateSql(districtTable, "example.sql", *sqlTable)
+        err := district.GenerateSql(districtTable, "example.sql", *sqlTable, *withSqlIgnore)
         if err != nil {
             fmt.Fprintf(os.Stderr, "Generate sql error: %s.\n", err.Error())
             os.Exit(3)

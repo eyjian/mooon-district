@@ -235,7 +235,7 @@ func GenerateCsv(districtTable *Table, csvFilepath, csvDelimiter string, withCod
     return nil
 }
 
-func GenerateSql(districtTable *Table, sqlFilepath, tableName string) error {
+func GenerateSql(districtTable *Table, sqlFilepath, tableName string, withIgnore bool) error {
     var err error
     var builder strings.Builder
     filepath := sqlFilepath
@@ -263,7 +263,11 @@ func GenerateSql(districtTable *Table, sqlFilepath, tableName string) error {
     builder.WriteString(") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n")
     builder.WriteString("*/\n")
 
-    builder.WriteString(fmt.Sprintf("INSERT INTO %s VALUES \n", tableName))
+    if withIgnore {
+        builder.WriteString(fmt.Sprintf("INSERT IGNORE INTO %s VALUES \n", tableName))
+    } else {
+        builder.WriteString(fmt.Sprintf("INSERT INTO %s VALUES \n", tableName))
+    }
     for _, provinceDistrict := range districtTable.Provinces {
         // 省/自治区/直辖市
         line := fmt.Sprintf("(%d,%d,%d,%d,'%s','%s','%s'),\n",
@@ -349,16 +353,16 @@ func parseLine(lineNo int, line string) (*District, error) {
 // IsHongKongMacauTaiwan 判断是否为香港/澳门/台湾
 func IsHongKongMacauTaiwan(name string) bool {
     return name == "香港" || name == "澳门" || name == "台湾" ||
-            name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
+        name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
 }
 
 // IsMunicipalityCode 是否为直辖市
 func IsMunicipalityCode(code uint32) bool {
     provinceCode := (code / 10000) * 10000
     return provinceCode == 110000 || // 北京市
-            provinceCode == 310000 || // 上海市
-            provinceCode == 120000 || // 天津市
-            provinceCode == 500000 // 重庆市
+        provinceCode == 310000 || // 上海市
+        provinceCode == 120000 || // 天津市
+        provinceCode == 500000 // 重庆市
 }
 
 func IsProvinceDistrictCode(code uint32) bool {
