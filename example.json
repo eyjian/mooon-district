@@ -665,6 +665,20 @@
               "grandparent": 130000
             },
             {
+              "code": 130471,
+              "name": "经开区",
+              "level": 3,
+              "parent": 130400,
+              "grandparent": 130000
+            },
+            {
+              "code": 130473,
+              "name": "冀南新区",
+              "level": 3,
+              "parent": 130400,
+              "grandparent": 130000
+            },
+            {
               "code": 130481,
               "name": "武安市",
               "level": 3,
@@ -731,6 +745,13 @@
             {
               "code": 130525,
               "name": "隆尧县",
+              "level": 3,
+              "parent": 130500,
+              "grandparent": 130000
+            },
+            {
+              "code": 130526,
+              "name": "任县",
               "level": 3,
               "parent": 130500,
               "grandparent": 130000
@@ -1097,6 +1118,13 @@
             {
               "code": 130732,
               "name": "赤城县",
+              "level": 3,
+              "parent": 130700,
+              "grandparent": 130000
+            },
+            {
+              "code": 130771,
+              "name": "经开区",
               "level": 3,
               "parent": 130700,
               "grandparent": 130000
@@ -1470,6 +1498,12 @@
               "grandparent": 130000
             }
           ]
+        },
+        {
+          "code": 133100,
+          "name": "雄安新区",
+          "level": 2,
+          "county_city": false
         }
       ]
     },
@@ -22682,13 +22716,137 @@
       "code": 810000,
       "name": "香港特别行政区",
       "level": 1,
-      "municipality": false
+      "municipality": false,
+      "cities": [
+        {
+          "code": 810001,
+          "name": "中西区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810002,
+          "name": "东区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810003,
+          "name": "九龙城区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810004,
+          "name": "观塘区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810005,
+          "name": "南区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810006,
+          "name": "深水埗区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810007,
+          "name": "湾仔区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810008,
+          "name": "黄大仙区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810009,
+          "name": "油尖旺区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810010,
+          "name": "离岛区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810011,
+          "name": "葵青区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810012,
+          "name": "北区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810013,
+          "name": "西贡区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810014,
+          "name": "沙田区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810015,
+          "name": "屯门区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810016,
+          "name": "大埔区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810017,
+          "name": "荃湾区",
+          "level": 3,
+          "county_city": true
+        },
+        {
+          "code": 810018,
+          "name": "元朗区",
+          "level": 3,
+          "county_city": true
+        }
+      ]
     },
     {
       "code": 820000,
       "name": "澳门特别行政区",
       "level": 1,
-      "municipality": false
+      "municipality": false,
+      "cities": [
+        {
+          "code": 820200,
+          "name": "凼仔",
+          "level": 2,
+          "county_city": false
+        },
+        {
+          "code": 820401,
+          "name": "路凼城",
+          "level": 3,
+          "county_city": true
+        }
+      ]
     }
   ]
 }
