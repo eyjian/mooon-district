@@ -372,6 +372,19 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
             lineNo++
         }
 
+        // 创建市级行政区列的公式名称，名称采用第一行的
+        provinceDistrictName, err := f.GetCellValue(sheetName, fmt.Sprintf("%s%d", columnName, 1))
+        if err != nil {
+            return fmt.Errorf("get province district name error: %s", err.Error())
+        }
+        err = f.SetDefinedName(&excelize.DefinedName{
+            Name:     provinceDistrictName,
+            RefersTo: fmt.Sprintf("'%s'!$%s$%d:$%s$%d", sheetName, columnName, 2, columnName, lineNo-1),
+        })
+        if err != nil {
+            return fmt.Errorf("set defined name of cities error: (%s) %s", provinceDistrictName, err.Error())
+        }
+
         // 下一列市级行政区名
         columnNumber++
     }
@@ -397,6 +410,19 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
             for _, countyDistrictName := range countyDistrictNameArray {
                 f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), countyDistrictName)
                 lineNo++
+            }
+
+            // 创建县级行政区列的公式名称，名称采用第一行的
+            cityDistrictName, err := f.GetCellValue(sheetName, fmt.Sprintf("%s%d", columnName, 1))
+            if err != nil {
+                return fmt.Errorf("get city district name error: %s", err.Error())
+            }
+            err = f.SetDefinedName(&excelize.DefinedName{
+                Name:     cityDistrictName,
+                RefersTo: fmt.Sprintf("'%s'!$%s$%d:$%s$%d", sheetName, columnName, 2, columnName, lineNo-1),
+            })
+            if err != nil {
+                return fmt.Errorf("set defined name of counties error: %s", err.Error())
             }
 
             // 下一列区县级行政区名
