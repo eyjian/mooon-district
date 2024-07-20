@@ -333,11 +333,21 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
     columnNumber := 1
     lineNo := 1
     columnName, _ := excelize.ColumnNumberToName(columnNumber)
-    f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), "省份")
+    provinceDistrictTitle := "省份"
+    f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), provinceDistrictTitle)
     lineNo++
     for _, provinceDistrictName := range provinceDistrictNameArray {
         f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), provinceDistrictName)
         lineNo++
+    }
+
+    // 创建省级行政区列的公式名称，名称采用第一行的
+    err = f.SetDefinedName(&excelize.DefinedName{
+        Name:     provinceDistrictTitle,
+        RefersTo: fmt.Sprintf("'%s'!$A$%d:$A$%d", sheetName, 2, lineNo-1),
+    })
+    if err != nil {
+        return fmt.Errorf("set defined name error: %s", err.Error())
     }
 
     // 空一行
