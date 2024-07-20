@@ -394,17 +394,21 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
 
     // 区县级行政区名
     for _, provinceDistrict := range districtTable.Provinces {
-        for _, CityDistrict := range provinceDistrict.CityDistrictTable {
+        for _, cityDistrict := range provinceDistrict.CityDistrictTable {
+            if cityDistrict.CountyDistrictTable == nil || len(cityDistrict.CountyDistrictTable) == 0 {
+                continue
+            }
+
             // 取得所有区县级行政区名数组
             countyDistrictNameArray := make([]string, 0)
-            for _, countyDistrict := range CityDistrict.CountyDistrictTable {
+            for _, countyDistrict := range cityDistrict.CountyDistrictTable {
                 countyDistrictNameArray = append(countyDistrictNameArray, countyDistrict.Name)
             }
             sortStrByPinyin(countyDistrictNameArray)
 
             columnName, _ = excelize.ColumnNumberToName(columnNumber)
             lineNo = 1
-            f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), CityDistrict.Name)
+            f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), cityDistrict.Name)
             lineNo++
 
             for _, countyDistrictName := range countyDistrictNameArray {
