@@ -22,3 +22,6 @@ go.work
 
 go.sum
 mooon-district
+
+~*.xlsx
+.DS_Store

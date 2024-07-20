@@ -7,11 +7,16 @@ import (
     "context"
     "encoding/json"
     "fmt"
+    "golang.org/x/text/collate"
+    "golang.org/x/text/language"
     "io"
     "os"
     "sort"
     "strconv"
     "strings"
+)
+import (
+    excelize "github.com/xuri/excelize/v2"
 )
 
 type Table struct {
@@ -308,11 +313,102 @@ func GenerateSql(districtTable *Table, sqlFilepath, tableName string, withIgnore
     return nil
 }
 
+func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
+    ctx := context.Background()
+    sheetName := "mooon-district"
+
+    f, err := createXlsxFile(ctx, sheetName)
+    if err != nil {
+        return fmt.Errorf("create %s error: %s", xlsxFilepath, err.Error())
+    }
+
+    // 取得所有省级行政区名数组
+    provinceDistrictNameArray := make([]string, 0)
+    for _, provinceDistrict := range districtTable.Provinces {
+        provinceDistrictNameArray = append(provinceDistrictNameArray, provinceDistrict.Name)
+    }
+    sortStrByPinyin(provinceDistrictNameArray)
+
+    // 第一列省级行政区
+    columnNumber := 1
+    lineNo := 1
+    columnName, _ := excelize.ColumnNumberToName(columnNumber)
+    f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), "省份")
+    lineNo++
+    for _, provinceDistrictName := range provinceDistrictNameArray {
+        f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), provinceDistrictName)
+        lineNo++
+    }
+
+    // 空一行
+    columnNumber = columnNumber + 2
+
+    // 市级行政区名
+    for _, provinceDistrict := range districtTable.Provinces {
+        // 取得所有市级行政区名数组
+        cityDistrictNameArray := make([]string, 0)
+        for _, cityDistrict := range provinceDistrict.CityDistrictTable {
+            cityDistrictNameArray = append(cityDistrictNameArray, cityDistrict.Name)
+        }
+        sortStrByPinyin(cityDistrictNameArray)
+
+        columnName, _ = excelize.ColumnNumberToName(columnNumber)
+        lineNo = 1
+        f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), provinceDistrict.Name)
+        lineNo++
+
+        for _, cityDistrictName := range cityDistrictNameArray {
+            f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), cityDistrictName)
+            lineNo++
+        }
+
+        // 下一列市级行政区名
+        columnNumber++
+    }
+
+    // 空一列
+    columnNumber++
+
+    // 区县级行政区名
+    for _, provinceDistrict := range districtTable.Provinces {
+        for _, CityDistrict := range provinceDistrict.CityDistrictTable {
+            // 取得所有区县级行政区名数组
+            countyDistrictNameArray := make([]string, 0)
+            for _, countyDistrict := range CityDistrict.CountyDistrictTable {
+                countyDistrictNameArray = append(countyDistrictNameArray, countyDistrict.Name)
+            }
+            sortStrByPinyin(countyDistrictNameArray)
+
+            columnName, _ = excelize.ColumnNumberToName(columnNumber)
+            lineNo = 1
+            f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), CityDistrict.Name)
+            lineNo++
+
+            for _, countyDistrictName := range countyDistrictNameArray {
+                f.SetCellStr(sheetName, fmt.Sprintf("%s%d", columnName, lineNo), countyDistrictName)
+                lineNo++
+            }
+
+            // 下一列区县级行政区名
+            columnNumber++
+        }
+
+        // 省级行政区间空一行
+        columnNumber++
+    }
+
+    err = f.SaveAs(xlsxFilepath)
+    if err != nil {
+        return fmt.Errorf("save %s error: %s", xlsxFilepath, err.Error())
+    }
+    return nil
+}
+
 func parseLine(lineNo int, line string) (*District, error) {
     // 使用逗号分隔每行数据
     parts := strings.Split(line, ",")
     if len(parts) != 2 {
-        return nil, fmt.Errorf("invalid row format: (%d) %s", lineNo, line)
+        return nil, fmt.Errorf("invalid row format: (%d) %s, expected format: DistrictCode,DistrictName", lineNo, line)
     }
 
     // 解析行政区代码
@@ -353,16 +449,16 @@ func parseLine(lineNo int, line string) (*District, error) {
 // IsHongKongMacauTaiwan 判断是否为香港/澳门/台湾
 func IsHongKongMacauTaiwan(name string) bool {
     return name == "香港" || name == "澳门" || name == "台湾" ||
-        name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
+            name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
 }
 
 // IsMunicipalityCode 是否为直辖市
 func IsMunicipalityCode(code uint32) bool {
     provinceCode := (code / 10000) * 10000
     return provinceCode == 110000 || // 北京市
-        provinceCode == 310000 || // 上海市
-        provinceCode == 120000 || // 天津市
-        provinceCode == 500000 // 重庆市
+            provinceCode == 310000 || // 上海市
+            provinceCode == 120000 || // 天津市
+            provinceCode == 500000 // 重庆市
 }
 
 func IsProvinceDistrictCode(code uint32) bool {
@@ -414,4 +510,38 @@ func createFile(filepath string) (*os.File, *bufio.Writer) {
     }
 
     return file, bufio.NewWriter(file)
+}
+
+func createXlsxFile(ctx context.Context, sheetName string) (*excelize.File, error) {
+    // 创建一个新的Excel文件
+    f := excelize.NewFile()
+    // 创建一个新的工作表
+    _, err := f.NewSheet(sheetName)
+    if err != nil {
+        return nil, err
+    }
+
+    f.SetAppProps(&excelize.AppProperties{
+        Application: "mooon-district",
+        Company:     "mooon",
+    })
+    f.SetDocProps(&excelize.DocProperties{
+        Creator:     "mooon",
+        Subject:     "mooon-district",
+        Title:       "mooon-district",
+        Version:     "0.0.1",
+        Description: "mooon-district",
+    })
+    return f, nil
+}
+
+// sortStrByPinyin 中文拼音字母序排序
+func sortStrByPinyin(strArray []string) {
+    // 创建一个collator，用于中文拼音字母序排序
+    collator := collate.New(language.Chinese)
+
+    // 使用sort.Slice()函数和collator对数组进行排序
+    sort.Slice(strArray, func(i, j int) bool {
+        return collator.CompareString(strArray[i], strArray[j]) < 0
+    })
 }

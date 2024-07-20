@@ -11,7 +11,7 @@ import (
 
 var (
     help             = flag.Bool("h", false, "Display a help message and exit.")
-    districtDataFile = flag.String("f", "", "File that stores district data.")
+    districtDataFile = flag.String("f", "", "Path to the district data file (e.g., -f=district-2022.csv).")
 
     withJson       = flag.Bool("with-json", false, "Whether to generate json format data.")
     withJsonIndent = flag.Bool("with-json-indent", true, "Whether JSON format is indented.")
@@ -25,6 +25,8 @@ var (
     withSql       = flag.Bool("with-sql", false, "Whether to generate sql data.")
     withSqlIgnore = flag.Bool("with-sql-ignore", false, "Use `INSERT IGNORE` to ignore existing.")
     sqlTable      = flag.String("sql-table", "t_dict_district", "Table name for sql data.")
+
+    withXlsx = flag.Bool("with-xlsx", false, "Whether to generate xlsx data.")
 )
 
 func main() {
@@ -66,6 +68,14 @@ func main() {
         err := district.GenerateSql(districtTable, "example.sql", *sqlTable, *withSqlIgnore)
         if err != nil {
             fmt.Fprintf(os.Stderr, "Generate sql error: %s.\n", err.Error())
+            os.Exit(3)
+        }
+    }
+    if *withXlsx {
+        done = true
+        err := district.GenerateXlsx(districtTable, "example.xlsx")
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Generate xlsx error: %s.\n", err.Error())
             os.Exit(3)
         }
     }
