@@ -347,7 +347,7 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
         RefersTo: fmt.Sprintf("'%s'!$A$%d:$A$%d", sheetName, 2, lineNo-1),
     })
     if err != nil {
-        return fmt.Errorf("set defined name error: %s", err.Error())
+        return fmt.Errorf("set defined name of provinces error: %s", err.Error())
     }
 
     // 空一行
