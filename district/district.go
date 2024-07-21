@@ -592,13 +592,37 @@ func sortStrByPinyin(strArray []string) {
 
 func setSheet1(f *excelize.File) error {
     sheetName := "Sheet1"
+
+    // 标题行样式
+    titleStyle, err := f.NewStyle(&excelize.Style{
+        Font: &excelize.Font{
+            Bold: true,
+        },
+        Alignment: &excelize.Alignment{
+            Horizontal: "center",
+            WrapText:   true, // 打开时文本自动换行，否则需要双击下才会换行
+        },
+        Protection: &excelize.Protection{
+            Locked: true,
+        },
+    })
+    if err != nil {
+        return fmt.Errorf("new style error: %s", err.Error())
+    }
+
     // 标题行
-    f.SetCellStr(sheetName, "A1", "省份")
-    f.SetCellStr(sheetName, "B1", "城市")
-    f.SetCellStr(sheetName, "C1", "区县")
+    f.SetCellStr(sheetName, "A1", "省级行政区\n（下拉选择）")
+    f.SetCellStr(sheetName, "B1", "市级行政区\n（下拉选择）")
+    f.SetCellStr(sheetName, "C1", "县级行政区\n（下拉选择）")
+
+    // 将加粗字体样式应用于整个第一行范围
+    err = f.SetRowStyle(sheetName, 1, 1, titleStyle)
+    if err != nil {
+        return fmt.Errorf("set row style error: %s", err.Error())
+    }
 
     // 设置列宽度
-    err := f.SetColWidth(sheetName, "A", "C", 20)
+    err = f.SetColWidth(sheetName, "A", "C", 20)
     if err != nil {
         return fmt.Errorf("set column width error: %s", err.Error())
     }
