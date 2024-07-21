@@ -437,6 +437,10 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
         columnNumber++
     }
 
+    err = setSheet1(f)
+    if err != nil {
+        return err
+    }
     err = f.SaveAs(xlsxFilepath)
     if err != nil {
         return fmt.Errorf("save %s error: %s", xlsxFilepath, err.Error())
@@ -584,4 +588,47 @@ func sortStrByPinyin(strArray []string) {
     sort.Slice(strArray, func(i, j int) bool {
         return collator.CompareString(strArray[i], strArray[j]) < 0
     })
+}
+
+func setSheet1(f *excelize.File) error {
+    sheetName := "Sheet1"
+    // 标题行
+    f.SetCellStr(sheetName, "A1", "省份")
+    f.SetCellStr(sheetName, "B1", "城市")
+    f.SetCellStr(sheetName, "C1", "区县")
+
+    // 设置列宽度
+    err := f.SetColWidth(sheetName, "A", "C", 20)
+    if err != nil {
+        return fmt.Errorf("set column width error: %s", err.Error())
+    }
+
+    // 数据行 - 省级行政区
+    // 在 A2 单元格中添加数据验证
+    dvRange1 := excelize.NewDataValidation(true)
+    dvRange1.Sqref = "A2:A2"
+    dvRange1.SetSqrefDropList("省份")
+    if err := f.AddDataValidation(sheetName, dvRange1); err != nil {
+        return fmt.Errorf("add data validation of provinces error: %s", err.Error())
+    }
+
+    // 数据行 - 市级行政区
+    // 在 B2 单元格中添加数据验证
+    dvRange2 := excelize.NewDataValidation(true)
+    dvRange2.Sqref = "B2:B2"
+    dvRange2.SetSqrefDropList("INDIRECT(A2)")
+    if err := f.AddDataValidation(sheetName, dvRange2); err != nil {
+        return fmt.Errorf("add data validation of cities error: %s", err.Error())
+    }
+
+    // 数据行 - 区县级行政区
+    // 在 C2 单元格中添加数据验证
+    dvRange3 := excelize.NewDataValidation(true)
+    dvRange3.Sqref = "C2:C2"
+    dvRange3.SetSqrefDropList("INDIRECT(B2)")
+    if err := f.AddDataValidation(sheetName, dvRange3); err != nil {
+        return fmt.Errorf("add data validation of counties error: %s", err.Error())
+    }
+
+    return nil
 }
