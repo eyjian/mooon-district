@@ -52,6 +52,6 @@ mooon-district -f ./district-2022.csv -with-sql=true -with-csv=true -with-json=t
 
 # 省市县三级行政区联动效果图
 
-请参见本目录下的**效果图.jpg**
+请参见本目录下的**效果图.jpg**，example.xlsx 为生成的省市县三级行政区联动模版。
 
 ![效果图](./效果图.jpg)
