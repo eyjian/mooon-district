@@ -627,31 +627,34 @@ func setSheet1(f *excelize.File) error {
         return fmt.Errorf("set column width error: %s", err.Error())
     }
 
-    // 数据行 - 省级行政区
-    // 在 A2 单元格中添加数据验证
-    dvRange1 := excelize.NewDataValidation(true)
-    dvRange1.Sqref = "A2:A2"
-    dvRange1.SetSqrefDropList("省份")
-    if err := f.AddDataValidation(sheetName, dvRange1); err != nil {
-        return fmt.Errorf("add data validation of provinces error: %s", err.Error())
-    }
+    // 数据行前三行，更好行可复制方式完成
+    for i := 2; i < 5; i++ {
+        // 数据行 - 省级行政区
+        // 在 A2 单元格中添加数据验证
+        dvRange1 := excelize.NewDataValidation(true)
+        dvRange1.Sqref = fmt.Sprintf("A%d:A%d", i, i)
+        dvRange1.SetSqrefDropList("省份")
+        if err := f.AddDataValidation(sheetName, dvRange1); err != nil {
+            return fmt.Errorf("add data validation of provinces error: %s", err.Error())
+        }
 
-    // 数据行 - 市级行政区
-    // 在 B2 单元格中添加数据验证
-    dvRange2 := excelize.NewDataValidation(true)
-    dvRange2.Sqref = "B2:B2"
-    dvRange2.SetSqrefDropList("INDIRECT(A2)")
-    if err := f.AddDataValidation(sheetName, dvRange2); err != nil {
-        return fmt.Errorf("add data validation of cities error: %s", err.Error())
-    }
+        // 数据行 - 市级行政区
+        // 在 B2 单元格中添加数据验证
+        dvRange2 := excelize.NewDataValidation(true)
+        dvRange2.Sqref = fmt.Sprintf("B%d:B%d", i, i)
+        dvRange2.SetSqrefDropList(fmt.Sprintf("INDIRECT(A%d)", i))
+        if err := f.AddDataValidation(sheetName, dvRange2); err != nil {
+            return fmt.Errorf("add data validation of cities error: %s", err.Error())
+        }
 
-    // 数据行 - 区县级行政区
-    // 在 C2 单元格中添加数据验证
-    dvRange3 := excelize.NewDataValidation(true)
-    dvRange3.Sqref = "C2:C2"
-    dvRange3.SetSqrefDropList("INDIRECT(B2)")
-    if err := f.AddDataValidation(sheetName, dvRange3); err != nil {
-        return fmt.Errorf("add data validation of counties error: %s", err.Error())
+        // 数据行 - 区县级行政区
+        // 在 C2 单元格中添加数据验证
+        dvRange3 := excelize.NewDataValidation(true)
+        dvRange3.Sqref = fmt.Sprintf("C%d:C%d", i, i)
+        dvRange3.SetSqrefDropList(fmt.Sprintf("INDIRECT(B%d)", i))
+        if err := f.AddDataValidation(sheetName, dvRange3); err != nil {
+            return fmt.Errorf("add data validation of counties error: %s", err.Error())
+        }
     }
 
     return nil
