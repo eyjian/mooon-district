@@ -355,6 +355,11 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
 
     // 市级行政区名
     for _, provinceDistrict := range districtTable.Provinces {
+        // 有些可能只到省级行政区
+        if provinceDistrict.CityDistrictTable == nil || len(provinceDistrict.CityDistrictTable) == 0 {
+            continue
+        }
+
         // 取得所有市级行政区名数组
         cityDistrictNameArray := make([]string, 0)
         for _, cityDistrict := range provinceDistrict.CityDistrictTable {
@@ -395,6 +400,7 @@ func GenerateXlsx(districtTable *Table, xlsxFilepath string) error {
     // 区县级行政区名
     for _, provinceDistrict := range districtTable.Provinces {
         for _, cityDistrict := range provinceDistrict.CityDistrictTable {
+            // 有些可能只到市级行政区
             if cityDistrict.CountyDistrictTable == nil || len(cityDistrict.CountyDistrictTable) == 0 {
                 continue
             }
@@ -493,16 +499,16 @@ func parseLine(lineNo int, line string) (*District, error) {
 // IsHongKongMacauTaiwan 判断是否为香港/澳门/台湾
 func IsHongKongMacauTaiwan(name string) bool {
     return name == "香港" || name == "澳门" || name == "台湾" ||
-            name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
+        name == "香港特别行政区" || name == "澳门特别行政区" || name == "台湾省"
 }
 
 // IsMunicipalityCode 是否为直辖市
 func IsMunicipalityCode(code uint32) bool {
     provinceCode := (code / 10000) * 10000
     return provinceCode == 110000 || // 北京市
-            provinceCode == 310000 || // 上海市
-            provinceCode == 120000 || // 天津市
-            provinceCode == 500000 // 重庆市
+        provinceCode == 310000 || // 上海市
+        provinceCode == 120000 || // 天津市
+        provinceCode == 500000 // 重庆市
 }
 
 func IsProvinceDistrictCode(code uint32) bool {
