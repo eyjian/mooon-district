@@ -49,6 +49,10 @@ mooon-district -f ./district-2022.csv -with-sql=true -with-csv=true -with-json=t
 
 * 省直辖县/县级市/旗，没有父级行政区地级市，它的行政区代码仍然是县/县级市/旗级的，如河南省的济源市
 * 省市县三级行政区联动模版，程序只完成列不含标题的前三行数据行，更多可以复制方式完成，效果请参见**效果图.jpg**
+* Excel 的出生日期计算公式（限 18 位身份证，B5 为身份证所在单元格）：=IF(LEN(B5)<>18,"",DATE(MID(B5,7,4),MID(B5,11,2),MID(B5,13,2)))
+* Excel 的性别计算公式（限 18 位身份证，B5 为身份证所在单元格）：=IF(LEN(B5)<>18,"",IF(MOD(MID(B5,17,1),2),"男","女"))
+* Excel 的年龄计算公式（限 18 位身份证，B5 为身份证所在单元格）：=IF(LEN(B5)<>18,"",YEAR(NOW())-YEAR(MID(B5,7,4))-IF(MONTH(NOW())<MID(B5,11,2) OR (MONTH(NOW())=MID(B5,11,2) AND DAY(NOW())<MID(B5,13,2)),"",1))
+* Excel 禁止第3行和第4行可修改，数据验证自定义：=AND(ROW()<3,ROW()>4)
 
 # 省市县三级行政区联动效果图
 
