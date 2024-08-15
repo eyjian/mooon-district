@@ -7,7 +7,8 @@
 * 数据来源于[民政部官网](https://www.mca.gov.cn/n156/n186/index.html)的公开数据，只支持三级行政区：省/自治区/直辖市、市/州/盟、区/县/县级市/旗，不支持到乡镇和街道这一级行政区；
 * 港澳数据来源于[http://tool.huiruisoft.com/district/810000.html](http://tool.huiruisoft.com/district/810000.html)；
 * [2023年中华人民共和国县以上行政区划代码](https://www.mca.gov.cn/mzsj/xzqh/2023/202301xzqh.html)；
-* [2023年中华人民共和国县以下行政区划代码变更情况](https://www.mca.gov.cn/mzsj/xzqh/2023/202302xzqh.html)
+* [2023年中华人民共和国县以下行政区划代码变更情况](https://www.mca.gov.cn/mzsj/xzqh/2023/202302xzqh.html)；
+* 不含开发区、园区等功能区，行政区划代码第三、四位90表示省（自治区）直辖县级行政区划汇总码；
 * district-2022.csv 为 2023 年度更新的数据源文件，也可视为本工具的输入文件格式的样例文件，使用时可参数方式指定为其它文件。
 
 # 安装工具
