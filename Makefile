@@ -11,7 +11,7 @@ ifeq ($(OS),Windows_NT)
 	set GOOS=windows
 	set GOARCH=amd64
 endif
-	go mod tidy && go build -o $@ $<
+	go mod tidy && go build -ldflags "-X 'main.buildTime=`date +%Y%m%d%H%M%S`'" -o $@ $<
 
 .PHONY: clean
 

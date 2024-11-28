@@ -11,6 +11,7 @@ import (
 
 var (
     help             = flag.Bool("h", false, "Display a help message and exit.")
+    version          = flag.Bool("v", false, "Display version info and exit.")
     districtDataFile = flag.String("f", "", "Path to the district data file (e.g., -f=district-2022.csv).")
 
     withJson       = flag.Bool("with-json", false, "Whether to generate json format data.")
@@ -29,10 +30,18 @@ var (
     withXlsx = flag.Bool("with-xlsx", false, "Whether to generate xlsx data.")
 )
 
+var (
+    buildTime string // build time
+)
+
 func main() {
     flag.Parse()
     if *help {
         usage()
+        os.Exit(1)
+    }
+    if *version {
+        showVersion()
         os.Exit(1)
     }
     if !checkParameters() {
@@ -87,6 +96,10 @@ func main() {
 
 func usage() {
     flag.Usage()
+}
+
+func showVersion() {
+    fmt.Printf("Version: %s, build at %s\n", "v0.0.1", buildTime)
 }
 
 func checkParameters() bool {
