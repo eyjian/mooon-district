@@ -2,9 +2,9 @@ module github.com/eyjian/mooon-district
 
 go 1.17
 
-replace github.com/eyjian/mooon-district/district => ./district
+//replace github.com/eyjian/mooon-district/district => ./district
 
-require github.com/eyjian/mooon-district/district v0.0.0-00010101000000-000000000000
+require github.com/eyjian/mooon-district/district v0.0.11
 
 require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
