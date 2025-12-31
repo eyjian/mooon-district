@@ -2,8 +2,6 @@ module github.com/eyjian/mooon-district/district
 
 go 1.24.0
 
-toolchain go1.24.11
-
 require (
 	github.com/coocood/freecache v1.2.4
 	github.com/pkg/errors v0.9.1
