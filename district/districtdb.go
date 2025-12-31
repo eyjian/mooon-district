@@ -220,7 +220,7 @@ func (q *Query) GetCountyCount(ctx context.Context, provinceName, cityName strin
 // getDistrictCodeFromDb 从数据库中取得行政区代码
 func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *Name) (*Code, error) {
 	var code Code
-	err := q.Db.Table(q.TableName).
+	err := q.Db.WithContext(ctx).Table(q.TableName).
 		Select("f_province_code", "f_city_code", "f_county_code").
 		Where("f_province_name = ? AND f_city_name = ? AND f_county_name = ?", name.ProvinceName, name.CityName, name.CountyName).
 		First(&code).Error
@@ -238,7 +238,7 @@ func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *Name) (*Code, e
 // getDistrictNameFromDb 从数据库中取得行政区名
 func (q *Query) getDistrictNameFromDb(ctx context.Context, code *Code) (*Name, error) {
 	var result Name
-	err := q.Db.Table(q.TableName).
+	err := q.Db.WithContext(ctx).Table(q.TableName).
 		Select("f_province_name", "f_city_name", "f_county_name").
 		Where("f_province_code = ? AND f_city_code = ? AND f_county_code = ?", code.ProvinceCode, code.CityCode, code.CountyCode).
 		First(&result).Error
@@ -257,7 +257,7 @@ func (q *Query) getDistrictNameFromDb(ctx context.Context, code *Code) (*Name, e
 func (q *Query) getCountyCountFromDb(ctx context.Context, provinceName, cityName string) (int, error) {
 	var count int64
 
-	err := q.Db.Table(q.TableName).
+	err := q.Db.WithContext(ctx).Table(q.TableName).
 		Where("f_province_name = ? AND f_city_name = ?", provinceName, cityName).
 		Count(&count).
 		Error
