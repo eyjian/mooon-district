@@ -104,9 +104,9 @@ func CacheMetricFPrintf(w io.Writer) {
 	cacheMetric := GetCacheMetric()
 	str, err := cacheMetric.String()
 	if err != nil {
-		fmt.Fprintf(w, "%s\n", err.Error())
+		_, _ = fmt.Fprintf(w, "%s\n", err.Error())
 	} else {
-		fmt.Fprintf(w, "%s\n", str)
+		_, _ = fmt.Fprintf(w, "%s\n", str)
 	}
 }
 
