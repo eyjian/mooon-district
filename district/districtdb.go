@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/coocood/freecache"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"io"
 	"math/rand"
@@ -180,7 +181,7 @@ func (q *Query) GetDistrictCode(ctx context.Context, name *Name) (*Code, error) 
 
 	code, err = q.getDistrictCodeFromDb(ctx, name)
 	if err == nil && code != nil {
-		q.updateDistrictCodeToCache(name, code)
+		_ = q.updateDistrictCodeToCache(name, code)
 	}
 	return code, err
 }
@@ -198,7 +199,7 @@ func (q *Query) GetDistrictName(ctx context.Context, code *Code) (*Name, error) 
 
 	name, err = q.getDistrictNameFromDb(ctx, code)
 	if err == nil && name != nil {
-		q.updateDistrictNameToCache(code, name)
+		_ = q.updateDistrictNameToCache(code, name)
 	}
 	return name, err
 }
@@ -212,7 +213,7 @@ func (q *Query) GetCountyCount(ctx context.Context, provinceName, cityName strin
 
 	count, err = q.getCountyCountFromDb(ctx, provinceName, cityName)
 	if err == nil {
-		q.updateCountyCountToCache(provinceName, cityName, count)
+		_ = q.updateCountyCountToCache(provinceName, cityName, count)
 	}
 	return count, err
 }
@@ -226,7 +227,7 @@ func (q *Query) getDistrictCodeFromDb(ctx context.Context, name *Name) (*Code, e
 		First(&code).Error
 
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // 不存在
 		}
 		return nil, err
@@ -244,7 +245,7 @@ func (q *Query) getDistrictNameFromDb(ctx context.Context, code *Code) (*Name, e
 		First(&result).Error
 
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil // 不存在
 		}
 		return nil, err
@@ -277,7 +278,7 @@ func (q *Query) getDistrictCodeFromCache(name *Name) (*Code, error) {
 		return nil, fmt.Errorf("cache get error: %s", err.Error())
 	}
 
-	err = json.Unmarshal(jsonBytes, code)
+	err = json.Unmarshal(jsonBytes, &code)
 	if err != nil {
 		return nil, fmt.Errorf("cache json unmarshal error: %s", err.Error())
 	}
@@ -311,7 +312,7 @@ func (q *Query) getDistrictNameFromCache(code *Code) (*Name, error) {
 		return nil, fmt.Errorf("cache get error: %s", err.Error())
 	}
 
-	err = json.Unmarshal(jsonBytes, name)
+	err = json.Unmarshal(jsonBytes, &name)
 	if err != nil {
 		return nil, fmt.Errorf("cache json unmarshal error: %s", err.Error())
 	}
